@@ -5,5 +5,10 @@ navbar:
   left:
     - text: "Home"
       href: index.html
+    - text: "Market Basket Analysis"
+      href: Online_Retail_Sales.html
     - text: "About Me"
       href: about.html
+output:
+  html_document:
+    theme: flatly

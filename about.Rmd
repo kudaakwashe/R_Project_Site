@@ -3,3 +3,6 @@ title: "About Me"
 ---
 
 I am currently compiling R based projects on this site.
+
+- __Name:__ Kuda
+- __Interests:__ Data Science and Data Analysis

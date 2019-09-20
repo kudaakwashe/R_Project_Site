@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Online Shopping Transaction Analysis</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 60px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h2 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h3 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h4 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h5 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h6 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">R Projects</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="Online_Retail_Sales.html">Market Basket Analysis</a>
+</li>
+<li>
+  <a href="about.html">About Me</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Online Shopping Transaction Analysis</h1>
+
+</div>
+
+
+<p>Incuded libraries</p>
+<pre class="r"><code>library(readxl)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(DataExplorer)
+library(arules)
+library(arulesViz)
+library(RColorBrewer)</code></pre>
+<p>Read file from current working directory</p>
+<pre class="r"><code>online_data = read_excel(&quot;Online Retail.xlsx&quot;)</code></pre>
+<p>View data to have an idea of what it looks like</p>
+<pre class="r"><code>head(online_data)</code></pre>
+<pre><code>## # A tibble: 6 x 8
+##   InvoiceNo StockCode Description Quantity InvoiceDate         UnitPrice
+##   &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;          &lt;dbl&gt; &lt;dttm&gt;                  &lt;dbl&gt;
+## 1 536365    85123A    WHITE HANG~        6 2010-12-01 08:26:00      2.55
+## 2 536365    71053     WHITE META~        6 2010-12-01 08:26:00      3.39
+## 3 536365    84406B    CREAM CUPI~        8 2010-12-01 08:26:00      2.75
+## 4 536365    84029G    KNITTED UN~        6 2010-12-01 08:26:00      3.39
+## 5 536365    84029E    RED WOOLLY~        6 2010-12-01 08:26:00      3.39
+## 6 536365    22752     SET 7 BABU~        2 2010-12-01 08:26:00      7.65
+## # ... with 2 more variables: CustomerID &lt;dbl&gt;, Country &lt;chr&gt;</code></pre>
+<pre class="r"><code>tail(online_data)</code></pre>
+<pre><code>## # A tibble: 6 x 8
+##   InvoiceNo StockCode Description Quantity InvoiceDate         UnitPrice
+##   &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;          &lt;dbl&gt; &lt;dttm&gt;                  &lt;dbl&gt;
+## 1 581587    23256     CHILDRENS ~        4 2011-12-09 12:50:00      4.15
+## 2 581587    22613     PACK OF 20~       12 2011-12-09 12:50:00      0.85
+## 3 581587    22899     CHILDREN&#39;S~        6 2011-12-09 12:50:00      2.1 
+## 4 581587    23254     CHILDRENS ~        4 2011-12-09 12:50:00      4.15
+## 5 581587    23255     CHILDRENS ~        4 2011-12-09 12:50:00      4.15
+## 6 581587    22138     BAKING SET~        3 2011-12-09 12:50:00      4.95
+## # ... with 2 more variables: CustomerID &lt;dbl&gt;, Country &lt;chr&gt;</code></pre>
+<pre class="r"><code>str(online_data)</code></pre>
+<pre><code>## Classes &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;:    541909 obs. of  8 variables:
+##  $ InvoiceNo  : chr  &quot;536365&quot; &quot;536365&quot; &quot;536365&quot; &quot;536365&quot; ...
+##  $ StockCode  : chr  &quot;85123A&quot; &quot;71053&quot; &quot;84406B&quot; &quot;84029G&quot; ...
+##  $ Description: chr  &quot;WHITE HANGING HEART T-LIGHT HOLDER&quot; &quot;WHITE METAL LANTERN&quot; &quot;CREAM CUPID HEARTS COAT HANGER&quot; &quot;KNITTED UNION FLAG HOT WATER BOTTLE&quot; ...
+##  $ Quantity   : num  6 6 8 6 6 2 6 6 6 32 ...
+##  $ InvoiceDate: POSIXct, format: &quot;2010-12-01 08:26:00&quot; &quot;2010-12-01 08:26:00&quot; ...
+##  $ UnitPrice  : num  2.55 3.39 2.75 3.39 3.39 7.65 4.25 1.85 1.85 1.69 ...
+##  $ CustomerID : num  17850 17850 17850 17850 17850 ...
+##  $ Country    : chr  &quot;United Kingdom&quot; &quot;United Kingdom&quot; &quot;United Kingdom&quot; &quot;United Kingdom&quot; ...</code></pre>
+<pre class="r"><code>summary(online_data)</code></pre>
+<pre><code>##   InvoiceNo          StockCode         Description       
+##  Length:541909      Length:541909      Length:541909     
+##  Class :character   Class :character   Class :character  
+##  Mode  :character   Mode  :character   Mode  :character  
+##                                                          
+##                                                          
+##                                                          
+##                                                          
+##     Quantity          InvoiceDate                    UnitPrice        
+##  Min.   :-80995.00   Min.   :2010-12-01 08:26:00   Min.   :-11062.06  
+##  1st Qu.:     1.00   1st Qu.:2011-03-28 11:34:00   1st Qu.:     1.25  
+##  Median :     3.00   Median :2011-07-19 17:17:00   Median :     2.08  
+##  Mean   :     9.55   Mean   :2011-07-04 13:34:57   Mean   :     4.61  
+##  3rd Qu.:    10.00   3rd Qu.:2011-10-19 11:27:00   3rd Qu.:     4.13  
+##  Max.   : 80995.00   Max.   :2011-12-09 12:50:00   Max.   : 38970.00  
+##                                                                       
+##    CustomerID       Country         
+##  Min.   :12346    Length:541909     
+##  1st Qu.:13953    Class :character  
+##  Median :15152    Mode  :character  
+##  Mean   :15288                      
+##  3rd Qu.:16791                      
+##  Max.   :18287                      
+##  NA&#39;s   :135080</code></pre>
+<p>Visualise dataset structure</p>
+<pre class="r"><code>plot_str(online_data, fontSize = 40)
+plot_intro(online_data)</code></pre>
+<p><img src="Online_Retail_Sales_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>plot_missing(online_data)</code></pre>
+<p><img src="Online_Retail_Sales_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
+<p>Change data types for the different variables and removes spaces before and after observations</p>
+<pre class="r"><code>online_data$InvoiceNo = trimws(as.character(online_data$InvoiceNo))
+online_data$Description = trimws(online_data$Description)
+
+
+online_data = online_data%&gt;%mutate_if(is.character, as.factor)
+online_data$CustomerID = as.factor(online_data$CustomerID)
+head(online_data)</code></pre>
+<pre><code>## # A tibble: 6 x 8
+##   InvoiceNo StockCode Description Quantity InvoiceDate         UnitPrice
+##   &lt;fct&gt;     &lt;fct&gt;     &lt;fct&gt;          &lt;dbl&gt; &lt;dttm&gt;                  &lt;dbl&gt;
+## 1 536365    85123A    WHITE HANG~        6 2010-12-01 08:26:00      2.55
+## 2 536365    71053     WHITE META~        6 2010-12-01 08:26:00      3.39
+## 3 536365    84406B    CREAM CUPI~        8 2010-12-01 08:26:00      2.75
+## 4 536365    84029G    KNITTED UN~        6 2010-12-01 08:26:00      3.39
+## 5 536365    84029E    RED WOOLLY~        6 2010-12-01 08:26:00      3.39
+## 6 536365    22752     SET 7 BABU~        2 2010-12-01 08:26:00      7.65
+## # ... with 2 more variables: CustomerID &lt;fct&gt;, Country &lt;fct&gt;</code></pre>
+<pre class="r"><code>str(online_data)</code></pre>
+<pre><code>## Classes &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;:    541909 obs. of  8 variables:
+##  $ InvoiceNo  : Factor w/ 25900 levels &quot;536365&quot;,&quot;536366&quot;,..: 1 1 1 1 1 1 1 2 2 3 ...
+##  $ StockCode  : Factor w/ 4070 levels &quot;10002&quot;,&quot;10080&quot;,..: 3538 2795 3045 2986 2985 1663 801 1548 1547 3306 ...
+##  $ Description: Factor w/ 4211 levels &quot;*Boombox Ipod Classic&quot;,..: 4014 4022 919 1947 2967 3221 1560 1685 1682 248 ...
+##  $ Quantity   : num  6 6 8 6 6 2 6 6 6 32 ...
+##  $ InvoiceDate: POSIXct, format: &quot;2010-12-01 08:26:00&quot; &quot;2010-12-01 08:26:00&quot; ...
+##  $ UnitPrice  : num  2.55 3.39 2.75 3.39 3.39 7.65 4.25 1.85 1.85 1.69 ...
+##  $ CustomerID : Factor w/ 4372 levels &quot;12346&quot;,&quot;12347&quot;,..: 4049 4049 4049 4049 4049 4049 4049 4049 4049 541 ...
+##  $ Country    : Factor w/ 38 levels &quot;Australia&quot;,&quot;Austria&quot;,..: 36 36 36 36 36 36 36 36 36 36 ...</code></pre>
+<pre class="r"><code>apply(online_data, 2, function(x) length(unique(x)))</code></pre>
+<pre><code>##   InvoiceNo   StockCode Description    Quantity InvoiceDate   UnitPrice 
+##       25900        4070        4212         722       23260        1630 
+##  CustomerID     Country 
+##        4373          38</code></pre>
+<p>Removing cancelled orders, adjusted bad debt, remove zero or negative quantities, negative unit prices and NAs</p>
+<pre class="r"><code>plot(online_data$UnitPrice,ylab = &quot;Prices&quot;, main = &quot;Prices&quot;)</code></pre>
+<p><img src="Online_Retail_Sales_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code>online_data[(online_data$UnitPrice &lt;= 0),]</code></pre>
+<pre><code>## # A tibble: 2,517 x 8
+##    InvoiceNo StockCode Description Quantity InvoiceDate         UnitPrice
+##    &lt;fct&gt;     &lt;fct&gt;     &lt;fct&gt;          &lt;dbl&gt; &lt;dttm&gt;                  &lt;dbl&gt;
+##  1 536414    22139     &lt;NA&gt;              56 2010-12-01 11:52:00         0
+##  2 536545    21134     &lt;NA&gt;               1 2010-12-01 14:32:00         0
+##  3 536546    22145     &lt;NA&gt;               1 2010-12-01 14:33:00         0
+##  4 536547    37509     &lt;NA&gt;               1 2010-12-01 14:33:00         0
+##  5 536549    85226A    &lt;NA&gt;               1 2010-12-01 14:34:00         0
+##  6 536550    85044     &lt;NA&gt;               1 2010-12-01 14:34:00         0
+##  7 536552    20950     &lt;NA&gt;               1 2010-12-01 14:34:00         0
+##  8 536553    37461     &lt;NA&gt;               3 2010-12-01 14:35:00         0
+##  9 536554    84670     &lt;NA&gt;              23 2010-12-01 14:35:00         0
+## 10 536589    21777     &lt;NA&gt;             -10 2010-12-01 16:50:00         0
+## # ... with 2,507 more rows, and 2 more variables: CustomerID &lt;fct&gt;,
+## #   Country &lt;fct&gt;</code></pre>
+<pre class="r"><code>plot(online_data$Quantity, ylab = &quot;Quantity&quot;, main = &quot;Quantities Purchased&quot;)</code></pre>
+<p><img src="Online_Retail_Sales_files/figure-html/unnamed-chunk-6-2.png" width="672" /></p>
+<pre class="r"><code>online_data[(online_data$Quantity &lt;= 0),]</code></pre>
+<pre><code>## # A tibble: 10,624 x 8
+##    InvoiceNo StockCode Description Quantity InvoiceDate         UnitPrice
+##    &lt;fct&gt;     &lt;fct&gt;     &lt;fct&gt;          &lt;dbl&gt; &lt;dttm&gt;                  &lt;dbl&gt;
+##  1 C536379   D         Discount          -1 2010-12-01 09:41:00    27.5  
+##  2 C536383   35004C    SET OF 3 C~       -1 2010-12-01 09:49:00     4.65 
+##  3 C536391   22556     PLASTERS I~      -12 2010-12-01 10:24:00     1.65 
+##  4 C536391   21984     PACK OF 12~      -24 2010-12-01 10:24:00     0.290
+##  5 C536391   21983     PACK OF 12~      -24 2010-12-01 10:24:00     0.290
+##  6 C536391   21980     PACK OF 12~      -24 2010-12-01 10:24:00     0.290
+##  7 C536391   21484     CHICK GREY~      -12 2010-12-01 10:24:00     3.45 
+##  8 C536391   22557     PLASTERS I~      -12 2010-12-01 10:24:00     1.65 
+##  9 C536391   22553     PLASTERS I~      -24 2010-12-01 10:24:00     1.65 
+## 10 C536506   22960     JAM MAKING~       -6 2010-12-01 12:38:00     4.25 
+## # ... with 10,614 more rows, and 2 more variables: CustomerID &lt;fct&gt;,
+## #   Country &lt;fct&gt;</code></pre>
+<pre class="r"><code>unique(substr(online_data$InvoiceNo, 1,1))</code></pre>
+<pre><code>## [1] &quot;5&quot; &quot;C&quot; &quot;A&quot;</code></pre>
+<pre class="r"><code>online_data1 = filter(online_data, !(substr(online_data$InvoiceNo, 1,1) %in% c(&quot;A&quot;,&quot;C&quot;)),
+                        online_data$Quantity &gt; 0,
+                        online_data$Description != &quot;?&quot;,
+                        !(online_data$Description %in% c(&quot;amazon&quot;, &quot;AMAZON&quot;)),
+                        !is.na(online_data$Description))
+
+summary(online_data1$UnitPrice)</code></pre>
+<pre><code>##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+##     0.000     1.250     2.080     3.883     4.130 13541.330</code></pre>
+<pre class="r"><code>summary(online_data1$Quantity)</code></pre>
+<pre><code>##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+##     1.00     1.00     3.00    10.59    10.00 80995.00</code></pre>
+<pre class="r"><code>apply(online_data, 2, function(x) sum(is.na(x)))</code></pre>
+<pre><code>##   InvoiceNo   StockCode Description    Quantity InvoiceDate   UnitPrice 
+##           0           0        1454           0           0           0 
+##  CustomerID     Country 
+##      135080           0</code></pre>
+<pre class="r"><code>apply(online_data1, 2, function(x) sum(is.na(x)))</code></pre>
+<pre><code>##   InvoiceNo   StockCode Description    Quantity InvoiceDate   UnitPrice 
+##           0           0           0           0           0           0 
+##  CustomerID     Country 
+##      132749           0</code></pre>
+<pre class="r"><code>dim(online_data1)</code></pre>
+<pre><code>## [1] 530673      8</code></pre>
+<p>Aggregating Invoices and items</p>
+<pre class="r"><code>online_data1_agg = split(online_data1$Description, online_data1$InvoiceNo)
+head(online_data1_agg)</code></pre>
+<pre><code>## $`536365`
+## [1] WHITE HANGING HEART T-LIGHT HOLDER  WHITE METAL LANTERN                
+## [3] CREAM CUPID HEARTS COAT HANGER      KNITTED UNION FLAG HOT WATER BOTTLE
+## [5] RED WOOLLY HOTTIE WHITE HEART.      SET 7 BABUSHKA NESTING BOXES       
+## [7] GLASS STAR FROSTED T-LIGHT HOLDER  
+## 4211 Levels: *Boombox Ipod Classic *USB Office Mirror Ball ... ZINC WIRE SWEETHEART LETTER TRAY
+## 
+## $`536366`
+## [1] HAND WARMER UNION JACK    HAND WARMER RED POLKA DOT
+## 4211 Levels: *Boombox Ipod Classic *USB Office Mirror Ball ... ZINC WIRE SWEETHEART LETTER TRAY
+## 
+## $`536367`
+##  [1] ASSORTED COLOUR BIRD ORNAMENT      POPPY&#39;S PLAYHOUSE BEDROOM         
+##  [3] POPPY&#39;S PLAYHOUSE KITCHEN          FELTCRAFT PRINCESS CHARLOTTE DOLL 
+##  [5] IVORY KNITTED MUG COSY             BOX OF 6 ASSORTED COLOUR TEASPOONS
+##  [7] BOX OF VINTAGE JIGSAW BLOCKS       BOX OF VINTAGE ALPHABET BLOCKS    
+##  [9] HOME BUILDING BLOCK WORD           LOVE BUILDING BLOCK WORD          
+## [11] RECIPE BOX WITH METAL HEART        DOORMAT NEW ENGLAND               
+## 4211 Levels: *Boombox Ipod Classic *USB Office Mirror Ball ... ZINC WIRE SWEETHEART LETTER TRAY
+## 
+## $`536368`
+## [1] JAM MAKING SET WITH JARS       RED COAT RACK PARIS FASHION   
+## [3] YELLOW COAT RACK PARIS FASHION BLUE COAT RACK PARIS FASHION  
+## 4211 Levels: *Boombox Ipod Classic *USB Office Mirror Ball ... ZINC WIRE SWEETHEART LETTER TRAY
+## 
+## $`536369`
+## [1] BATH BUILDING BLOCK WORD
+## 4211 Levels: *Boombox Ipod Classic *USB Office Mirror Ball ... ZINC WIRE SWEETHEART LETTER TRAY
+## 
+## $`536370`
+##  [1] ALARM CLOCK BAKELIKE PINK          ALARM CLOCK BAKELIKE RED          
+##  [3] ALARM CLOCK BAKELIKE GREEN         PANDA AND BUNNIES STICKER SHEET   
+##  [5] STARS GIFT TAPE                    INFLATABLE POLITICAL GLOBE        
+##  [7] VINTAGE HEADS AND TAILS CARD GAME  SET/2 RED RETROSPOT TEA TOWELS    
+##  [9] ROUND SNACK BOXES SET OF4 WOODLAND SPACEBOY LUNCH BOX                
+## [11] LUNCH BOX I LOVE LONDON            CIRCUS PARADE LUNCH BOX           
+## [13] CHARLOTTE BAG DOLLY GIRL DESIGN    RED TOADSTOOL LED NIGHT LIGHT     
+## [15] SET 2 TEA TOWELS I LOVE LONDON     VINTAGE SEASIDE JIGSAW PUZZLES    
+## [17] MINI JIGSAW CIRCUS PARADE          MINI JIGSAW SPACEBOY              
+## [19] MINI PAINT SET VINTAGE             POSTAGE                           
+## 4211 Levels: *Boombox Ipod Classic *USB Office Mirror Ball ... ZINC WIRE SWEETHEART LETTER TRAY</code></pre>
+<p>Average number of items purchased</p>
+<pre class="r"><code>avg_quantity = online_data1 %&gt;% group_by(InvoiceNo) %&gt;% summarize(avg_basket = mean(Quantity))
+head(avg_quantity)</code></pre>
+<pre><code>## # A tibble: 6 x 2
+##   InvoiceNo avg_basket
+##   &lt;fct&gt;          &lt;dbl&gt;
+## 1 536365          5.71
+## 2 536366          6   
+## 3 536367          6.92
+## 4 536368          3.75
+## 5 536369          3   
+## 6 536370         22.4</code></pre>
+<pre class="r"><code>ggplot(data = avg_quantity, aes(x = avg_quantity$avg_basket)) + geom_histogram(fill = &quot;blue&quot;, bins = 50000) + geom_rug() + 
+  coord_cartesian(xlim = c(0,80)) + labs(x = &quot;Average Basket&quot;, y = &quot;Frequency&quot;, title = &quot;Average items purchased&quot;)</code></pre>
+<p><img src="Online_Retail_Sales_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>Remove duplicate items in the same invoice</p>
+<pre class="r"><code>online_data1_agg1 = list()
+for (i in 1:length(online_data1_agg)){
+  online_data1_agg1[[i]] = unique(online_data1_agg[[i]])
+}
+head(online_data1_agg1)</code></pre>
+<pre><code>## [[1]]
+## [1] WHITE HANGING HEART T-LIGHT HOLDER  WHITE METAL LANTERN                
+## [3] CREAM CUPID HEARTS COAT HANGER      KNITTED UNION FLAG HOT WATER BOTTLE
+## [5] RED WOOLLY HOTTIE WHITE HEART.      SET 7 BABUSHKA NESTING BOXES       
+## [7] GLASS STAR FROSTED T-LIGHT HOLDER  
+## 4211 Levels: *Boombox Ipod Classic *USB Office Mirror Ball ... ZINC WIRE SWEETHEART LETTER TRAY
+## 
+## [[2]]
+## [1] HAND WARMER UNION JACK    HAND WARMER RED POLKA DOT
+## 4211 Levels: *Boombox Ipod Classic *USB Office Mirror Ball ... ZINC WIRE SWEETHEART LETTER TRAY
+## 
+## [[3]]
+##  [1] ASSORTED COLOUR BIRD ORNAMENT      POPPY&#39;S PLAYHOUSE BEDROOM         
+##  [3] POPPY&#39;S PLAYHOUSE KITCHEN          FELTCRAFT PRINCESS CHARLOTTE DOLL 
+##  [5] IVORY KNITTED MUG COSY             BOX OF 6 ASSORTED COLOUR TEASPOONS
+##  [7] BOX OF VINTAGE JIGSAW BLOCKS       BOX OF VINTAGE ALPHABET BLOCKS    
+##  [9] HOME BUILDING BLOCK WORD           LOVE BUILDING BLOCK WORD          
+## [11] RECIPE BOX WITH METAL HEART        DOORMAT NEW ENGLAND               
+## 4211 Levels: *Boombox Ipod Classic *USB Office Mirror Ball ... ZINC WIRE SWEETHEART LETTER TRAY
+## 
+## [[4]]
+## [1] JAM MAKING SET WITH JARS       RED COAT RACK PARIS FASHION   
+## [3] YELLOW COAT RACK PARIS FASHION BLUE COAT RACK PARIS FASHION  
+## 4211 Levels: *Boombox Ipod Classic *USB Office Mirror Ball ... ZINC WIRE SWEETHEART LETTER TRAY
+## 
+## [[5]]
+## [1] BATH BUILDING BLOCK WORD
+## 4211 Levels: *Boombox Ipod Classic *USB Office Mirror Ball ... ZINC WIRE SWEETHEART LETTER TRAY
+## 
+## [[6]]
+##  [1] ALARM CLOCK BAKELIKE PINK          ALARM CLOCK BAKELIKE RED          
+##  [3] ALARM CLOCK BAKELIKE GREEN         PANDA AND BUNNIES STICKER SHEET   
+##  [5] STARS GIFT TAPE                    INFLATABLE POLITICAL GLOBE        
+##  [7] VINTAGE HEADS AND TAILS CARD GAME  SET/2 RED RETROSPOT TEA TOWELS    
+##  [9] ROUND SNACK BOXES SET OF4 WOODLAND SPACEBOY LUNCH BOX                
+## [11] LUNCH BOX I LOVE LONDON            CIRCUS PARADE LUNCH BOX           
+## [13] CHARLOTTE BAG DOLLY GIRL DESIGN    RED TOADSTOOL LED NIGHT LIGHT     
+## [15] SET 2 TEA TOWELS I LOVE LONDON     VINTAGE SEASIDE JIGSAW PUZZLES    
+## [17] MINI JIGSAW CIRCUS PARADE          MINI JIGSAW SPACEBOY              
+## [19] MINI PAINT SET VINTAGE             POSTAGE                           
+## 4211 Levels: *Boombox Ipod Classic *USB Office Mirror Ball ... ZINC WIRE SWEETHEART LETTER TRAY</code></pre>
+<p>Using arules to analyse transactions</p>
+<pre class="r"><code>trxns = as(online_data1_agg1, &quot;transactions&quot;)
+summary(trxns)</code></pre>
+<pre><code>## transactions as itemMatrix in sparse format with
+##  25900 rows (elements/itemsets/transactions) and
+##  4061 columns (items) and a density of 0.004942437 
+## 
+## most frequent items:
+## WHITE HANGING HEART T-LIGHT HOLDER            JUMBO BAG RED RETROSPOT 
+##                               2260                               2092 
+##           REGENCY CAKESTAND 3 TIER                      PARTY BUNTING 
+##                               1989                               1686 
+##            LUNCH BAG RED RETROSPOT                            (Other) 
+##                               1564                             510254 
+## 
+## element (itemset/transaction) length distribution:
+## sizes
+##    0    1    2    3    4    5    6    7    8    9   10   11   12   13   14 
+## 5784 1778  836  689  665  687  616  606  605  611  545  552  493  507  528 
+##   15   16   17   18   19   20   21   22   23   24   25   26   27   28   29 
+##  547  552  465  441  488  434  402  346  347  309  248  259  243  242  271 
+##   30   31   32   33   34   35   36   37   38   39   40   41   42   43   44 
+##  225  197  188  162  177  136  135  131  122  137  122  123  103   97  104 
+##   45   46   47   48   49   50   51   52   53   54   55   56   57   58   59 
+##   99   91   84   95   88   86   57   65   78   70   73   50   64   51   36 
+##   60   61   62   63   64   65   66   67   68   69   70   71   72   73   74 
+##   61   40   29   43   39   39   42   34   40   29   33   39   23   25   34 
+##   75   76   77   78   79   80   81   82   83   84   85   86   87   88   89 
+##   26   21   19   27   15   13   20   21   15   23   17   17    9   17   11 
+##   90   91   92   93   94   95   96   97   98   99  100  101  102  103  104 
+##   12    9   15   16    7    5   10    9   13    5   11   10    3    6    9 
+##  105  106  107  108  109  110  111  112  113  114  115  116  117  118  119 
+##    2    4    7    4    4    4    7    3    5    6    6    8    6    4    8 
+##  120  121  122  123  124  125  126  127  128  129  130  131  132  133  134 
+##    5    6   11    4    5    3    4    8    1    2    4    3    3    2    5 
+##  135  136  137  138  139  140  141  142  143  144  145  146  147  148  149 
+##    4    2    6    6    2    5    6    2    2    5    5    3    2    4    5 
+##  150  151  152  153  154  155  156  157  158  159  160  161  162  163  164 
+##    3    5    3    6    2    2    2    4    4    1    2    3    3    3    2 
+##  165  166  167  168  169  170  171  172  173  174  175  176  177  178  179 
+##    5    4    1    4    4    2    2    4    3    4    2    5    5    4    2 
+##  180  181  182  183  184  185  186  187  188  189  190  191  192  193  194 
+##    4    2    6    4    3    3    3    2    3    4    4    2    3    2    3 
+##  195  196  197  198  199  202  203  204  205  206  207  208  210  211  212 
+##    3    4    2    2    3    2    5    5    1    2    1    4    1    4    1 
+##  213  214  215  216  217  218  219  220  222  223  224  225  226  227  228 
+##    1    2    1    2    4    2    2    2    1    1    3    3    1    1    1 
+##  229  230  232  233  234  235  237  238  239  241  242  243  244  247  249 
+##    2    1    1    1    1    1    3    3    1    2    1    2    2    2    3 
+##  250  253  254  255  257  259  261  262  263  264  266  267  270  275  279 
+##    2    1    2    2    2    1    2    2    1    2    1    1    2    1    2 
+##  280  282  283  285  286  288  289  291  292  295  296  298  299  301  309 
+##    2    1    2    2    1    2    1    1    1    1    1    2    1    1    1 
+##  310  315  319  320  331  332  333  334  339  341  344  345  347  348  349 
+##    1    1    1    1    1    4    1    1    1    1    1    1    2    1    1 
+##  352  354  357  358  363  369  375  376  379  382  386  388  399  404  408 
+##    2    1    1    1    1    1    1    1    1    1    1    1    2    2    1 
+##  411  414  415  416  419  420  428  433  434  438  439  443  449  453  455 
+##    1    1    1    2    1    1    1    1    2    1    2    1    1    1    1 
+##  458  460  463  471  482  486  487  488  494  499  503  506  514  515  517 
+##    1    1    1    1    1    1    1    1    1    1    2    1    1    1    1 
+##  518  520  522  524  525  527  529  531  536  539  541  543  552  561  567 
+##    1    1    1    1    2    1    1    1    1    1    1    1    1    1    1 
+##  572  578  585  588  589  593  595  599  601  607  622  629  635  645  647 
+##    1    1    2    1    1    1    1    1    1    1    1    1    1    1    1 
+##  649  661  673  676  687  703  720  731  748 1108 
+##    1    1    1    1    1    1    1    1    1    1 
+## 
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    0.00    1.00   10.00   20.07   23.00 1108.00 
+## 
+## includes extended item information - examples:
+##                    labels
+## 1   *Boombox Ipod Classic
+## 2 *USB Office Mirror Ball
+## 3  10 COLOUR SPACEBOY PEN</code></pre>
+<pre class="r"><code>inspect(trxns[1:10,])</code></pre>
+<pre><code>##      items                                
+## [1]  {CREAM CUPID HEARTS COAT HANGER,     
+##       GLASS STAR FROSTED T-LIGHT HOLDER,  
+##       KNITTED UNION FLAG HOT WATER BOTTLE,
+##       RED WOOLLY HOTTIE WHITE HEART.,     
+##       SET 7 BABUSHKA NESTING BOXES,       
+##       WHITE HANGING HEART T-LIGHT HOLDER, 
+##       WHITE METAL LANTERN}                
+## [2]  {HAND WARMER RED POLKA DOT,          
+##       HAND WARMER UNION JACK}             
+## [3]  {ASSORTED COLOUR BIRD ORNAMENT,      
+##       BOX OF 6 ASSORTED COLOUR TEASPOONS, 
+##       BOX OF VINTAGE ALPHABET BLOCKS,     
+##       BOX OF VINTAGE JIGSAW BLOCKS,       
+##       DOORMAT NEW ENGLAND,                
+##       FELTCRAFT PRINCESS CHARLOTTE DOLL,  
+##       HOME BUILDING BLOCK WORD,           
+##       IVORY KNITTED MUG COSY,             
+##       LOVE BUILDING BLOCK WORD,           
+##       POPPY&#39;S PLAYHOUSE BEDROOM,          
+##       POPPY&#39;S PLAYHOUSE KITCHEN,          
+##       RECIPE BOX WITH METAL HEART}        
+## [4]  {BLUE COAT RACK PARIS FASHION,       
+##       JAM MAKING SET WITH JARS,           
+##       RED COAT RACK PARIS FASHION,        
+##       YELLOW COAT RACK PARIS FASHION}     
+## [5]  {BATH BUILDING BLOCK WORD}           
+## [6]  {ALARM CLOCK BAKELIKE GREEN,         
+##       ALARM CLOCK BAKELIKE PINK,          
+##       ALARM CLOCK BAKELIKE RED,           
+##       CHARLOTTE BAG DOLLY GIRL DESIGN,    
+##       CIRCUS PARADE LUNCH BOX,            
+##       INFLATABLE POLITICAL GLOBE,         
+##       LUNCH BOX I LOVE LONDON,            
+##       MINI JIGSAW CIRCUS PARADE,          
+##       MINI JIGSAW SPACEBOY,               
+##       MINI PAINT SET VINTAGE,             
+##       PANDA AND BUNNIES STICKER SHEET,    
+##       POSTAGE,                            
+##       RED TOADSTOOL LED NIGHT LIGHT,      
+##       ROUND SNACK BOXES SET OF4 WOODLAND, 
+##       SET 2 TEA TOWELS I LOVE LONDON,     
+##       SET/2 RED RETROSPOT TEA TOWELS,     
+##       SPACEBOY LUNCH BOX,                 
+##       STARS GIFT TAPE,                    
+##       VINTAGE HEADS AND TAILS CARD GAME,  
+##       VINTAGE SEASIDE JIGSAW PUZZLES}     
+## [7]  {PAPER CHAIN KIT 50&#39;S CHRISTMAS}     
+## [8]  {HAND WARMER RED POLKA DOT,          
+##       HAND WARMER UNION JACK}             
+## [9]  {CREAM CUPID HEARTS COAT HANGER,     
+##       EDWARDIAN PARASOL RED,              
+##       GLASS STAR FROSTED T-LIGHT HOLDER,  
+##       KNITTED UNION FLAG HOT WATER BOTTLE,
+##       RED WOOLLY HOTTIE WHITE HEART.,     
+##       RETRO COFFEE MUGS ASSORTED,         
+##       SAVE THE PLANET MUG,                
+##       SET 7 BABUSHKA NESTING BOXES,       
+##       VINTAGE BILLBOARD DRINK ME MUG,     
+##       VINTAGE BILLBOARD LOVE/HATE MUG,    
+##       WHITE HANGING HEART T-LIGHT HOLDER, 
+##       WHITE METAL LANTERN,                
+##       WOOD 2 DRAWER CABINET WHITE FINISH, 
+##       WOOD S/3 CABINET ANT WHITE FINISH,  
+##       WOODEN FRAME ANTIQUE WHITE,         
+##       WOODEN PICTURE FRAME WHITE FINISH}  
+## [10] {VICTORIAN SEWING BOX LARGE}</code></pre>
+<p>Frequency of purchased items</p>
+<pre class="r"><code>itemFrequencyPlot(trxns, support=0.05)</code></pre>
+<p><img src="Online_Retail_Sales_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<pre class="r"><code>itemFrequencyPlot(trxns, topN=10)</code></pre>
+<p><img src="Online_Retail_Sales_files/figure-html/unnamed-chunk-11-2.png" width="672" /></p>
+<p>Setting up rules</p>
+<pre class="r"><code>online_basket = apriori(data = trxns, parameter = list(support = 0.005, conf = 0.75))</code></pre>
+<pre><code>## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##        0.75    0.1    1 none FALSE            TRUE       5   0.005      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 129 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[4061 item(s), 25900 transaction(s)] done [0.17s].
+## sorting and recoding items ... [1267 item(s)] done [0.01s].
+## creating transaction tree ... done [0.13s].
+## checking subsets of size 1 2 3 4 5 6 done [0.37s].
+## writing ... [1775 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.12s].</code></pre>
+<pre class="r"><code>inspect(sort(online_basket[1:100], by = &quot;lift&quot;))</code></pre>
+<pre><code>##       lhs                                      rhs                                       support confidence      lift count
+## [1]   {HERB MARKER MINT,                                                                                                   
+##        HERB MARKER PARSLEY}                 =&gt; {HERB MARKER CHIVES}                  0.007065637  0.8632075 106.97165   183
+## [2]   {HERB MARKER PARSLEY,                                                                                                
+##        HERB MARKER THYME}                   =&gt; {HERB MARKER CHIVES}                  0.007065637  0.8591549 106.46944   183
+## [3]   {SET/6 COLLAGE PAPER CUPS}            =&gt; {SET/6 COLLAGE PAPER PLATES}          0.006216216  0.8895028 106.16646   161
+## [4]   {PACK OF 6 SKULL PAPER CUPS}          =&gt; {PACK OF 6 SKULL PAPER PLATES}        0.005212355  0.7894737 105.94491   135
+## [5]   {HERB MARKER MINT,                                                                                                   
+##        HERB MARKER THYME}                   =&gt; {HERB MARKER CHIVES}                  0.006795367  0.8543689 105.87634   176
+## [6]   {DOLLY GIRL CHILDRENS CUP}            =&gt; {DOLLY GIRL CHILDRENS BOWL}           0.005868726  0.7794872 105.70009   152
+## [7]   {DOLLY GIRL CHILDRENS BOWL}           =&gt; {DOLLY GIRL CHILDRENS CUP}            0.005868726  0.7958115 105.70009   152
+## [8]   {HERB MARKER PARSLEY,                                                                                                
+##        HERB MARKER ROSEMARY}                =&gt; {HERB MARKER CHIVES}                  0.007065637  0.8511628 105.47903   183
+## [9]   {HERB MARKER CHIVES,                                                                                                 
+##        HERB MARKER THYME}                   =&gt; {HERB MARKER PARSLEY}                 0.007065637  0.9682540 105.36881   183
+## [10]  {HERB MARKER CHIVES,                                                                                                 
+##        HERB MARKER ROSEMARY}                =&gt; {HERB MARKER PARSLEY}                 0.007065637  0.9682540 105.36881   183
+## [11]  {HERB MARKER CHIVES,                                                                                                 
+##        HERB MARKER ROSEMARY}                =&gt; {HERB MARKER THYME}                   0.007027027  0.9629630 105.23519   182
+## [12]  {HERB MARKER CHIVES,                                                                                                 
+##        HERB MARKER MINT}                    =&gt; {HERB MARKER PARSLEY}                 0.007065637  0.9631579 104.81424   183
+## [13]  {HERB MARKER BASIL,                                                                                                  
+##        HERB MARKER CHIVES}                  =&gt; {HERB MARKER PARSLEY}                 0.006756757  0.9615385 104.63801   175
+## [14]  {HERB MARKER CHIVES,                                                                                                 
+##        HERB MARKER THYME}                   =&gt; {HERB MARKER ROSEMARY}                0.007027027  0.9629630 103.91975   182
+## [15]  {HERB MARKER BASIL,                                                                                                  
+##        HERB MARKER CHIVES}                  =&gt; {HERB MARKER THYME}                   0.006679537  0.9505495 103.87861   173
+## [16]  {HERB MARKER CHIVES,                                                                                                 
+##        HERB MARKER PARSLEY}                 =&gt; {HERB MARKER THYME}                   0.007065637  0.9481865 103.62038   183
+## [17]  {HERB MARKER MINT,                                                                                                   
+##        HERB MARKER ROSEMARY}                =&gt; {HERB MARKER CHIVES}                  0.006833977  0.8349057 103.46439   177
+## [18]  {HERB MARKER CHIVES,                                                                                                 
+##        HERB MARKER PARSLEY}                 =&gt; {HERB MARKER MINT}                    0.007065637  0.9481865 102.32513   183
+## [19]  {HERB MARKER CHIVES,                                                                                                 
+##        HERB MARKER PARSLEY}                 =&gt; {HERB MARKER ROSEMARY}                0.007065637  0.9481865 102.32513   183
+## [20]  {HERB MARKER BASIL,                                                                                                  
+##        HERB MARKER PARSLEY}                 =&gt; {HERB MARKER CHIVES}                  0.006756757  0.8254717 102.29530   175
+## [21]  {HERB MARKER BASIL,                                                                                                  
+##        HERB MARKER THYME}                   =&gt; {HERB MARKER CHIVES}                  0.006679537  0.8238095 102.08931   173
+## [22]  {HERB MARKER ROSEMARY,                                                                                               
+##        HERB MARKER THYME}                   =&gt; {HERB MARKER CHIVES}                  0.007027027  0.8235294 102.05460   182
+## [23]  {CHRISTMAS TREE HEART DECORATION}     =&gt; {CHRISTMAS TREE STAR DECORATION}      0.005405405  0.7777778 101.73962   140
+## [24]  {HERB MARKER BASIL,                                                                                                  
+##        HERB MARKER CHIVES}                  =&gt; {HERB MARKER ROSEMARY}                0.006602317  0.9395604 101.39423   171
+## [25]  {HERB MARKER BASIL,                                                                                                  
+##        HERB MARKER MINT}                    =&gt; {HERB MARKER CHIVES}                  0.006563707  0.8173077 101.28358   170
+## [26]  {HERB MARKER CHIVES,                                                                                                 
+##        HERB MARKER MINT}                    =&gt; {HERB MARKER THYME}                   0.006795367  0.9263158 101.23029   176
+## [27]  {HERB MARKER CHIVES,                                                                                                 
+##        HERB MARKER ROSEMARY}                =&gt; {HERB MARKER MINT}                    0.006833977  0.9365079 101.06481   177
+## [28]  {HERB MARKER BASIL,                                                                                                  
+##        HERB MARKER CHIVES}                  =&gt; {HERB MARKER MINT}                    0.006563707  0.9340659 100.80128   170
+## [29]  {HERB MARKER THYME}                   =&gt; {HERB MARKER ROSEMARY}                0.008532819  0.9324895 100.63115   221
+## [30]  {HERB MARKER ROSEMARY}                =&gt; {HERB MARKER THYME}                   0.008532819  0.9208333 100.63115   221
+## [31]  {HERB MARKER CHIVES,                                                                                                 
+##        HERB MARKER MINT}                    =&gt; {HERB MARKER ROSEMARY}                0.006833977  0.9315789 100.53289   177
+## [32]  {HERB MARKER CHIVES,                                                                                                 
+##        HERB MARKER THYME}                   =&gt; {HERB MARKER MINT}                    0.006795367  0.9312169 100.49383   176
+## [33]  {HERB MARKER CHIVES}                  =&gt; {HERB MARKER PARSLEY}                 0.007451737  0.9234450 100.49254   193
+## [34]  {HERB MARKER PARSLEY}                 =&gt; {HERB MARKER CHIVES}                  0.007451737  0.8109244 100.49254   193
+## [35]  {BEADED CRYSTAL HEART GREEN ON STICK} =&gt; {BEADED CRYSTAL HEART PINK ON STICK}  0.005289575  0.7965116 100.14394   137
+## [36]  {HERB MARKER THYME}                   =&gt; {HERB MARKER CHIVES}                  0.007297297  0.7974684  98.82503   189
+## [37]  {HERB MARKER CHIVES}                  =&gt; {HERB MARKER THYME}                   0.007297297  0.9043062  98.82503   189
+## [38]  {HERB MARKER CHIVES}                  =&gt; {HERB MARKER MINT}                    0.007335907  0.9090909  98.10606   190
+## [39]  {HERB MARKER MINT}                    =&gt; {HERB MARKER CHIVES}                  0.007335907  0.7916667  98.10606   190
+## [40]  {HERB MARKER CHIVES,                                                                                                 
+##        HERB MARKER THYME}                   =&gt; {HERB MARKER BASIL}                   0.006679537  0.9153439  97.96449   173
+## [41]  {HERB MARKER THYME}                   =&gt; {HERB MARKER PARSLEY}                 0.008223938  0.8987342  97.80343   213
+## [42]  {HERB MARKER PARSLEY}                 =&gt; {HERB MARKER THYME}                   0.008223938  0.8949580  97.80343   213
+## [43]  {HERB MARKER CHIVES}                  =&gt; {HERB MARKER ROSEMARY}                0.007297297  0.9043062  97.58971   189
+## [44]  {HERB MARKER ROSEMARY}                =&gt; {HERB MARKER CHIVES}                  0.007297297  0.7875000  97.58971   189
+## [45]  {HERB MARKER ROSEMARY}                =&gt; {HERB MARKER PARSLEY}                 0.008301158  0.8958333  97.48775   215
+## [46]  {HERB MARKER PARSLEY}                 =&gt; {HERB MARKER ROSEMARY}                0.008301158  0.9033613  97.48775   215
+## [47]  {HERB MARKER CHIVES,                                                                                                 
+##        HERB MARKER PARSLEY}                 =&gt; {HERB MARKER BASIL}                   0.006756757  0.9067358  97.04321   175
+## [48]  {HERB MARKER CHIVES,                                                                                                 
+##        HERB MARKER ROSEMARY}                =&gt; {HERB MARKER BASIL}                   0.006602317  0.9047619  96.83196   171
+## [49]  {HERB MARKER PARSLEY}                 =&gt; {HERB MARKER MINT}                    0.008185328  0.8907563  96.12745   212
+## [50]  {HERB MARKER MINT}                    =&gt; {HERB MARKER PARSLEY}                 0.008185328  0.8833333  96.12745   212
+## [51]  {HERB MARKER CHIVES,                                                                                                 
+##        HERB MARKER MINT}                    =&gt; {HERB MARKER BASIL}                   0.006563707  0.8947368  95.75903   170
+## [52]  {HERB MARKER BASIL}                   =&gt; {HERB MARKER ROSEMARY}                0.008262548  0.8842975  95.43044   214
+## [53]  {HERB MARKER ROSEMARY}                =&gt; {HERB MARKER BASIL}                   0.008262548  0.8916667  95.43044   214
+## [54]  {HERB MARKER PARSLEY}                 =&gt; {HERB MARKER BASIL}                   0.008185328  0.8907563  95.33301   212
+## [55]  {HERB MARKER BASIL}                   =&gt; {HERB MARKER PARSLEY}                 0.008185328  0.8760331  95.33301   212
+## [56]  {HERB MARKER MINT}                    =&gt; {HERB MARKER ROSEMARY}                0.008185328  0.8833333  95.32639   212
+## [57]  {HERB MARKER ROSEMARY}                =&gt; {HERB MARKER MINT}                    0.008185328  0.8833333  95.32639   212
+## [58]  {HERB MARKER THYME}                   =&gt; {HERB MARKER BASIL}                   0.008108108  0.8860759  94.83210   210
+## [59]  {HERB MARKER BASIL}                   =&gt; {HERB MARKER THYME}                   0.008108108  0.8677686  94.83210   210
+## [60]  {HERB MARKER THYME}                   =&gt; {HERB MARKER MINT}                    0.007953668  0.8691983  93.80098   206
+## [61]  {HERB MARKER MINT}                    =&gt; {HERB MARKER THYME}                   0.007953668  0.8583333  93.80098   206
+## [62]  {PINK VINTAGE SPOT BEAKER}            =&gt; {BLUE VINTAGE SPOT BEAKER}            0.005907336  0.8010471  93.45550   153
+## [63]  {HERB MARKER CHIVES}                  =&gt; {HERB MARKER BASIL}                   0.007027027  0.8708134  93.19862   182
+## [64]  {HERB MARKER BASIL}                   =&gt; {HERB MARKER CHIVES}                  0.007027027  0.7520661  93.19862   182
+## [65]  {HERB MARKER MINT}                    =&gt; {HERB MARKER BASIL}                   0.008030888  0.8666667  92.75482   208
+## [66]  {HERB MARKER BASIL}                   =&gt; {HERB MARKER MINT}                    0.008030888  0.8595041  92.75482   208
+## [67]  {COFFEE MUG DOG + BALL DESIGN}        =&gt; {COFFEE MUG CAT + BIRD DESIGN}        0.005945946  0.7817259  79.39883   154
+## [68]  {COFFEE MUG PEARS  DESIGN}            =&gt; {COFFEE MUG APPLES DESIGN}            0.006216216  0.7594340  75.36145   161
+## [69]  {MONSTERS STENCIL CRAFT}              =&gt; {HAPPY STENCIL CRAFT}                 0.006293436  0.7725118  71.20305   163
+## [70]  {WOOD STAMP SET HAPPY BIRTHDAY}       =&gt; {WOOD STAMP SET THANK YOU}            0.005096525  0.7630058  70.57803   132
+## [71]  {POPPY&#39;S PLAYHOUSE BATHROOM}          =&gt; {POPPY&#39;S PLAYHOUSE LIVINGROOM}        0.007220077  0.8237885  65.04916   187
+## [72]  {KEY FOB , FRONT  DOOR}               =&gt; {KEY FOB , BACK DOOR}                 0.006138996  0.7571429  63.46278   159
+## [73]  {REGENCY TEA PLATE PINK}              =&gt; {REGENCY TEA PLATE GREEN}             0.010733591  0.9114754  61.96119   278
+## [74]  {REGENCY SUGAR BOWL GREEN}            =&gt; {REGENCY MILK JUG PINK}               0.009382239  0.7546584  59.40928   243
+## [75]  {ROLL WRAP 50&#39;S RED CHRISTMAS}        =&gt; {ROLL WRAP 50&#39;S CHRISTMAS}            0.006640927  0.8113208  59.35934   172
+## [76]  {SET/10 BLUE POLKADOT PARTY CANDLES}  =&gt; {SET/10 PINK POLKADOT PARTY CANDLES}  0.007142857  0.7708333  58.03658   185
+## [77]  {CHILDRENS CUTLERY DOLLY GIRL}        =&gt; {CHILDRENS CUTLERY SPACEBOY}          0.008532819  0.7594502  54.63822   221
+## [78]  {CHILDRENS CUTLERY POLKADOT BLUE,                                                                                    
+##        CHILDRENS CUTLERY RETROSPOT RED}     =&gt; {CHILDRENS CUTLERY POLKADOT PINK}     0.005405405  0.8536585  52.26893   140
+## [79]  {REGENCY TEA PLATE PINK}              =&gt; {REGENCY TEA PLATE ROSES}             0.010386100  0.8819672  51.33247   269
+## [80]  {POPPY&#39;S PLAYHOUSE BATHROOM}          =&gt; {POPPY&#39;S PLAYHOUSE BEDROOM}           0.007297297  0.8325991  50.97947   189
+## [81]  {POPPY&#39;S PLAYHOUSE BATHROOM}          =&gt; {POPPY&#39;S PLAYHOUSE KITCHEN}           0.007413127  0.8458150  50.24451   192
+## [82]  {REGENCY TEA PLATE GREEN}             =&gt; {REGENCY TEA PLATE ROSES}             0.012316602  0.8372703  48.73102   319
+## [83]  {POPPY&#39;S PLAYHOUSE LIVINGROOM}        =&gt; {POPPY&#39;S PLAYHOUSE BEDROOM}           0.010038610  0.7926829  48.53543   260
+## [84]  {POPPY&#39;S PLAYHOUSE LIVINGROOM}        =&gt; {POPPY&#39;S PLAYHOUSE KITCHEN}           0.010115830  0.7987805  47.45049   262
+## [85]  {SMALL CHOCOLATES PINK BOWL}          =&gt; {SMALL MARSHMALLOWS PINK BOWL}        0.007760618  0.8170732  47.34272   201
+## [86]  {CHILDRENS CUTLERY POLKADOT BLUE}     =&gt; {CHILDRENS CUTLERY POLKADOT PINK}     0.008494208  0.7612457  46.61055   220
+## [87]  {BISCUITS SMALL BOWL LIGHT BLUE}      =&gt; {SMALL MARSHMALLOWS PINK BOWL}        0.005366795  0.8034682  46.55442   139
+## [88]  {BISCUITS SMALL BOWL LIGHT BLUE}      =&gt; {SMALL DOLLY MIX DESIGN ORANGE BOWL}  0.006023166  0.9017341  44.31672   156
+## [89]  {WOODEN TREE CHRISTMAS SCANDINAVIAN}  =&gt; {WOODEN STAR CHRISTMAS SCANDINAVIAN}  0.010849421  0.8313609  42.05517   281
+## [90]  {SMALL CHOCOLATES PINK BOWL}          =&gt; {SMALL DOLLY MIX DESIGN ORANGE BOWL}  0.007876448  0.8292683  40.75531   204
+## [91]  {SET/6 RED SPOTTY PAPER CUPS}         =&gt; {SET/6 RED SPOTTY PAPER PLATES}       0.013513514  0.8177570  40.18958   350
+## [92]  {SMALL MARSHMALLOWS PINK BOWL}        =&gt; {SMALL DOLLY MIX DESIGN ORANGE BOWL}  0.013474903  0.7807606  38.37135   349
+## [93]  {WOODEN STAR CHRISTMAS SCANDINAVIAN}  =&gt; {WOODEN HEART CHRISTMAS SCANDINAVIAN} 0.014980695  0.7578125  36.48205   388
+## [94]  {BEADED CRYSTAL HEART GREEN ON STICK} =&gt; {DOTCOM POSTAGE}                      0.006563707  0.9883721  36.15655   170
+## [95]  {BEADED CRYSTAL HEART PINK ON STICK}  =&gt; {DOTCOM POSTAGE}                      0.007760618  0.9757282  35.69401   201
+## [96]  {SET/4 RED MINI ROSE CANDLE IN BOWL}  =&gt; {DOTCOM POSTAGE}                      0.006254826  0.8481675  31.02760   162
+## [97]  {GOLD MINI TAPE MEASURE}              =&gt; {DOTCOM POSTAGE}                      0.006409266  0.8097561  29.62243   166
+## [98]  {PINK REGENCY TEACUP AND SAUCER}      =&gt; {GREEN REGENCY TEACUP AND SAUCER}     0.024440154  0.8263708  21.08670   633
+## [99]  {PINK REGENCY TEACUP AND SAUCER}      =&gt; {ROSES REGENCY TEACUP AND SAUCER}     0.023127413  0.7819843  18.99943   599
+## [100] {GREEN REGENCY TEACUP AND SAUCER}     =&gt; {ROSES REGENCY TEACUP AND SAUCER}     0.029652510  0.7566502  18.38390   768</code></pre>
+<p>Plot Rules</p>
+<pre class="r"><code>plot(online_basket, control = list(col = brewer.pal(11, &quot;Spectral&quot;)))</code></pre>
+<pre><code>## To reduce overplotting, jitter is added! Use jitter = 0 to prevent jitter.</code></pre>
+<p><img src="Online_Retail_Sales_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p>Plot of the top 10 rules by support</p>
+<pre class="r"><code>sub_rules = head(sort(online_basket, by=&quot;support&quot;),10)
+inspect(sub_rules)</code></pre>
+<pre><code>##      lhs                                     rhs                                      support confidence      lift count
+## [1]  {GREEN REGENCY TEACUP AND SAUCER}    =&gt; {ROSES REGENCY TEACUP AND SAUCER}     0.02965251  0.7566502 18.383904   768
+## [2]  {PINK REGENCY TEACUP AND SAUCER}     =&gt; {GREEN REGENCY TEACUP AND SAUCER}     0.02444015  0.8263708 21.086702   633
+## [3]  {PINK REGENCY TEACUP AND SAUCER}     =&gt; {ROSES REGENCY TEACUP AND SAUCER}     0.02312741  0.7819843 18.999432   599
+## [4]  {PINK REGENCY TEACUP AND SAUCER,                                                                                   
+##       ROSES REGENCY TEACUP AND SAUCER}    =&gt; {GREEN REGENCY TEACUP AND SAUCER}     0.02092664  0.9048414 23.089056   542
+## [5]  {GREEN REGENCY TEACUP AND SAUCER,                                                                                  
+##       PINK REGENCY TEACUP AND SAUCER}     =&gt; {ROSES REGENCY TEACUP AND SAUCER}     0.02092664  0.8562401 20.803583   542
+## [6]  {JUMBO BAG PINK POLKADOT,                                                                                          
+##       JUMBO STORAGE BAG SUKI}             =&gt; {JUMBO BAG RED RETROSPOT}             0.01594595  0.8019417  9.928438   413
+## [7]  {REGENCY CAKESTAND 3 TIER,                                                                                         
+##       ROSES REGENCY TEACUP AND SAUCER}    =&gt; {GREEN REGENCY TEACUP AND SAUCER}     0.01575290  0.7771429 19.830542   408
+## [8]  {GREEN REGENCY TEACUP AND SAUCER,                                                                                  
+##       REGENCY CAKESTAND 3 TIER}           =&gt; {ROSES REGENCY TEACUP AND SAUCER}     0.01575290  0.8015717 19.475335   408
+## [9]  {WOODEN STAR CHRISTMAS SCANDINAVIAN} =&gt; {WOODEN HEART CHRISTMAS SCANDINAVIAN} 0.01498069  0.7578125 36.482052   388
+## [10] {JUMBO BAG PINK POLKADOT,                                                                                          
+##       JUMBO SHOPPER VINTAGE RED PAISLEY}  =&gt; {JUMBO BAG RED RETROSPOT}             0.01459459  0.8076923  9.999632   378</code></pre>
+<pre class="r"><code>plot(sub_rules, method=&quot;graph&quot;, cex = 0.5)</code></pre>
+<p><img src="Online_Retail_Sales_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p>Summary</p>
+<pre class="r"><code>summary(online_basket)</code></pre>
+<pre><code>## set of 1775 rules
+## 
+## rule length distribution (lhs + rhs):sizes
+##   2   3   4   5   6 
+##  70 721 758 214  12 
+## 
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   2.000   3.000   4.000   3.649   4.000   6.000 
+## 
+## summary of quality measures:
+##     support           confidence          lift             count      
+##  Min.   :0.005019   Min.   :0.7500   Min.   :  9.285   Min.   :130.0  
+##  1st Qu.:0.005328   1st Qu.:0.7832   1st Qu.: 19.267   1st Qu.:138.0  
+##  Median :0.005753   Median :0.8282   Median : 24.138   Median :149.0  
+##  Mean   :0.006218   Mean   :0.8401   Mean   : 34.440   Mean   :161.1  
+##  3rd Qu.:0.006564   3rd Qu.:0.8914   3rd Qu.: 35.125   3rd Qu.:170.0  
+##  Max.   :0.029653   Max.   :1.0000   Max.   :113.116   Max.   :768.0  
+## 
+## mining info:
+##   data ntransactions support confidence
+##  trxns         25900   0.005       0.75</code></pre>
+<p>Rules based on items containing the word COFFEE</p>
+<pre class="r"><code>rulesCoffee = subset(online_basket, subset= items %pin% &quot;COFFEE&quot;)
+summary(rulesCoffee)</code></pre>
+<pre><code>## set of 4 rules
+## 
+## rule length distribution (lhs + rhs):sizes
+## 2 3 
+## 2 2 
+## 
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##     2.0     2.0     2.5     2.5     3.0     3.0 
+## 
+## summary of quality measures:
+##     support           confidence          lift            count      
+##  Min.   :0.005598   Min.   :0.7594   Min.   : 9.549   Min.   :145.0  
+##  1st Qu.:0.005598   1st Qu.:0.7683   1st Qu.:25.517   1st Qu.:145.0  
+##  Median :0.005772   Median :0.7765   Median :53.100   Median :149.5  
+##  Mean   :0.005840   Mean   :0.7889   Mean   :48.787   Mean   :151.2  
+##  3rd Qu.:0.006014   3rd Qu.:0.7971   3rd Qu.:76.371   3rd Qu.:155.8  
+##  Max.   :0.006216   Max.   :0.8430   Max.   :79.399   Max.   :161.0  
+## 
+## mining info:
+##   data ntransactions support confidence
+##  trxns         25900   0.005       0.75</code></pre>
+<pre class="r"><code>sub_rules_coffee = head(sort(rulesCoffee, by=&quot;support&quot;),10)
+inspect(sub_rules_coffee)</code></pre>
+<pre><code>##     lhs                                   rhs                                support confidence      lift count
+## [1] {COFFEE MUG PEARS  DESIGN}         =&gt; {COFFEE MUG APPLES DESIGN}     0.006216216  0.7594340 75.361454   161
+## [2] {COFFEE MUG DOG + BALL DESIGN}     =&gt; {COFFEE MUG CAT + BIRD DESIGN} 0.005945946  0.7817259 79.398826   154
+## [3] {DOTCOM POSTAGE,                                                                                           
+##      SET 3 RETROSPOT TEA,COFFEE,SUGAR} =&gt; {JUMBO BAG RED RETROSPOT}      0.005598456  0.7712766  9.548788   145
+## [4] {JUMBO BAG RED RETROSPOT,                                                                                  
+##      SET 3 RETROSPOT TEA,COFFEE,SUGAR} =&gt; {DOTCOM POSTAGE}               0.005598456  0.8430233 30.839410   145</code></pre>
+<pre class="r"><code>plot(sub_rules_coffee, method=&quot;graph&quot;, cex = 0.5)</code></pre>
+<p><img src="Online_Retail_Sales_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p>Rules based on the right hand side items having the colours Red, Black or White</p>
+<pre class="r"><code>rulesColours = subset(online_basket, subset= rhs %pin% c(&quot;RED&quot;, &quot;BLACK&quot;, &quot;BLUE&quot;))</code></pre>
+<pre><code>## Warning in rhs %pin% c(&quot;RED&quot;, &quot;BLACK&quot;, &quot;BLUE&quot;): table contains more than
+## one item label pattern and only the first element will be used</code></pre>
+<pre class="r"><code>summary(rulesColours)</code></pre>
+<pre><code>## set of 520 rules
+## 
+## rule length distribution (lhs + rhs):sizes
+##   2   3   4   5 
+##   1 200 264  55 
+## 
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   2.000   3.000   4.000   3.717   4.000   5.000 
+## 
+## summary of quality measures:
+##     support           confidence          lift            count      
+##  Min.   :0.005019   Min.   :0.7500   Min.   : 9.285   Min.   :130.0  
+##  1st Qu.:0.005328   1st Qu.:0.7777   1st Qu.: 9.992   1st Qu.:138.0  
+##  Median :0.005772   Median :0.8108   Median :12.617   Median :149.5  
+##  Mean   :0.006396   Mean   :0.8210   Mean   :15.772   Mean   :165.7  
+##  3rd Qu.:0.006795   3rd Qu.:0.8583   3rd Qu.:20.874   3rd Qu.:176.0  
+##  Max.   :0.015946   Max.   :0.9640   Max.   :56.707   Max.   :413.0  
+## 
+## mining info:
+##   data ntransactions support confidence
+##  trxns         25900   0.005       0.75</code></pre>
+<pre class="r"><code>sub_rules_colours= head(sort(rulesColours, by=&quot;support&quot;),10)
+inspect(sub_rules_colours)</code></pre>
+<pre><code>##      lhs                                    rhs                                support confidence      lift count
+## [1]  {JUMBO BAG PINK POLKADOT,                                                                                   
+##       JUMBO STORAGE BAG SUKI}            =&gt; {JUMBO BAG RED RETROSPOT}       0.01594595  0.8019417  9.928438   413
+## [2]  {JUMBO BAG PINK POLKADOT,                                                                                   
+##       JUMBO SHOPPER VINTAGE RED PAISLEY} =&gt; {JUMBO BAG RED RETROSPOT}       0.01459459  0.8076923  9.999632   378
+## [3]  {SET/6 RED SPOTTY PAPER CUPS}       =&gt; {SET/6 RED SPOTTY PAPER PLATES} 0.01351351  0.8177570 40.189576   350
+## [4]  {JUMBO BAG PINK POLKADOT,                                                                                   
+##       JUMBO BAG WOODLAND ANIMALS}        =&gt; {JUMBO BAG RED RETROSPOT}       0.01316602  0.7948718  9.840908   341
+## [5]  {CHARLOTTE BAG SUKI DESIGN,                                                                                 
+##       STRAWBERRY CHARLOTTE BAG}          =&gt; {RED RETROSPOT CHARLOTTE BAG}   0.01289575  0.8048193 20.159400   334
+## [6]  {CHARLOTTE BAG PINK POLKADOT,                                                                               
+##       CHARLOTTE BAG SUKI DESIGN}         =&gt; {RED RETROSPOT CHARLOTTE BAG}   0.01270270  0.8024390 20.099778   329
+## [7]  {STRAWBERRY CHARLOTTE BAG,                                                                                  
+##       WOODLAND CHARLOTTE BAG}            =&gt; {RED RETROSPOT CHARLOTTE BAG}   0.01262548  0.8054187 20.174415   327
+## [8]  {CHARLOTTE BAG PINK POLKADOT,                                                                               
+##       STRAWBERRY CHARLOTTE BAG}          =&gt; {RED RETROSPOT CHARLOTTE BAG}   0.01258687  0.8601583 21.545552   326
+## [9]  {JUMBO  BAG BAROQUE BLACK WHITE,                                                                            
+##       JUMBO BAG PINK POLKADOT}           =&gt; {JUMBO BAG RED RETROSPOT}       0.01254826  0.7850242  9.718989   325
+## [10] {CHARLOTTE BAG PINK POLKADOT,                                                                               
+##       WOODLAND CHARLOTTE BAG}            =&gt; {RED RETROSPOT CHARLOTTE BAG}   0.01254826  0.8227848 20.609407   325</code></pre>
+<pre class="r"><code>plot(sub_rules_colours, method=&quot;graph&quot;, cex = 0.5)</code></pre>
+<p><img src="Online_Retail_Sales_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
