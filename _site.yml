@@ -1,0 +1,9 @@
+name: "R-Project-Website"
+output_dir: "."
+navbar:
+  title: "R Projects"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "About Me"
+      href: about.html
