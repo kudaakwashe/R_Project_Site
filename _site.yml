@@ -5,6 +5,8 @@ navbar:
   left:
     - text: "Home"
       href: index.html
+    - text: "PCA and Regression"
+      href: PCA_Regression.html      
     - text: "Market Basket Analysis"
       href: Online_Retail_Sales.html
     - text: "About Me"

@@ -1,0 +1,2104 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>PCA and Regression Combination</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 60px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h2 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h3 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h4 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h5 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h6 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">R Projects</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="PCA_Regression.html">PCA and Regression</a>
+</li>
+<li>
+  <a href="Online_Retail_Sales.html">Market Basket Analysis</a>
+</li>
+<li>
+  <a href="about.html">About Me</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">PCA and Regression Combination</h1>
+
+</div>
+
+
+<p>Load required libraries</p>
+<pre class="r"><code>library(DataExplorer)
+library(dplyr)
+library(formattable)
+library(packHV)
+library(corrplot)
+library(car)
+library(nFactors)
+library(pastecs)
+library(psych)
+library(bestNormalize)</code></pre>
+<p>Load data from working directory</p>
+<pre class="r"><code>hairData = read.csv(&quot;Factor-Hair-Revised.csv&quot;, header = TRUE)</code></pre>
+<p>Understanding the data</p>
+<pre class="r"><code>head(hairData)</code></pre>
+<pre><code>##   ID ProdQual Ecom TechSup CompRes Advertising ProdLine SalesFImage
+## 1  1      8.5  3.9     2.5     5.9         4.8      4.9         6.0
+## 2  2      8.2  2.7     5.1     7.2         3.4      7.9         3.1
+## 3  3      9.2  3.4     5.6     5.6         5.4      7.4         5.8
+## 4  4      6.4  3.3     7.0     3.7         4.7      4.7         4.5
+## 5  5      9.0  3.4     5.2     4.6         2.2      6.0         4.5
+## 6  6      6.5  2.8     3.1     4.1         4.0      4.3         3.7
+##   ComPricing WartyClaim OrdBilling DelSpeed Satisfaction
+## 1        6.8        4.7        5.0      3.7          8.2
+## 2        5.3        5.5        3.9      4.9          5.7
+## 3        4.5        6.2        5.4      4.5          8.9
+## 4        8.8        7.0        4.3      3.0          4.8
+## 5        6.8        6.1        4.5      3.5          7.1
+## 6        8.5        5.1        3.6      3.3          4.7</code></pre>
+<pre class="r"><code>tail(hairData)</code></pre>
+<pre><code>##      ID ProdQual Ecom TechSup CompRes Advertising ProdLine SalesFImage
+## 95   95      9.3  3.8     4.0     4.6         4.7      6.4         5.5
+## 96   96      8.6  4.8     5.6     5.3         2.3      6.0         5.7
+## 97   97      7.4  3.4     2.6     5.0         4.1      4.4         4.8
+## 98   98      8.7  3.2     3.3     3.2         3.1      6.1         2.9
+## 99   99      7.8  4.9     5.8     5.3         5.2      5.3         7.1
+## 100 100      7.9  3.0     4.4     5.1         5.9      4.2         4.8
+##     ComPricing WartyClaim OrdBilling DelSpeed Satisfaction
+## 95         7.4        5.3        3.6      3.4          7.7
+## 96         6.7        5.8        4.9      3.6          7.3
+## 97         7.2        4.5        4.2      3.7          6.3
+## 98         5.6        5.0        3.1      2.5          5.4
+## 99         7.9        6.0        4.3      3.9          6.4
+## 100        9.7        5.7        3.4      3.5          6.4</code></pre>
+<pre class="r"><code>str(hairData)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    100 obs. of  13 variables:
+##  $ ID          : int  1 2 3 4 5 6 7 8 9 10 ...
+##  $ ProdQual    : num  8.5 8.2 9.2 6.4 9 6.5 6.9 6.2 5.8 6.4 ...
+##  $ Ecom        : num  3.9 2.7 3.4 3.3 3.4 2.8 3.7 3.3 3.6 4.5 ...
+##  $ TechSup     : num  2.5 5.1 5.6 7 5.2 3.1 5 3.9 5.1 5.1 ...
+##  $ CompRes     : num  5.9 7.2 5.6 3.7 4.6 4.1 2.6 4.8 6.7 6.1 ...
+##  $ Advertising : num  4.8 3.4 5.4 4.7 2.2 4 2.1 4.6 3.7 4.7 ...
+##  $ ProdLine    : num  4.9 7.9 7.4 4.7 6 4.3 2.3 3.6 5.9 5.7 ...
+##  $ SalesFImage : num  6 3.1 5.8 4.5 4.5 3.7 5.4 5.1 5.8 5.7 ...
+##  $ ComPricing  : num  6.8 5.3 4.5 8.8 6.8 8.5 8.9 6.9 9.3 8.4 ...
+##  $ WartyClaim  : num  4.7 5.5 6.2 7 6.1 5.1 4.8 5.4 5.9 5.4 ...
+##  $ OrdBilling  : num  5 3.9 5.4 4.3 4.5 3.6 2.1 4.3 4.4 4.1 ...
+##  $ DelSpeed    : num  3.7 4.9 4.5 3 3.5 3.3 2 3.7 4.6 4.4 ...
+##  $ Satisfaction: num  8.2 5.7 8.9 4.8 7.1 4.7 5.7 6.3 7 5.5 ...</code></pre>
+<pre class="r"><code>summary(hairData)</code></pre>
+<pre><code>##        ID            ProdQual           Ecom          TechSup     
+##  Min.   :  1.00   Min.   : 5.000   Min.   :2.200   Min.   :1.300  
+##  1st Qu.: 25.75   1st Qu.: 6.575   1st Qu.:3.275   1st Qu.:4.250  
+##  Median : 50.50   Median : 8.000   Median :3.600   Median :5.400  
+##  Mean   : 50.50   Mean   : 7.810   Mean   :3.672   Mean   :5.365  
+##  3rd Qu.: 75.25   3rd Qu.: 9.100   3rd Qu.:3.925   3rd Qu.:6.625  
+##  Max.   :100.00   Max.   :10.000   Max.   :5.700   Max.   :8.500  
+##     CompRes       Advertising       ProdLine      SalesFImage   
+##  Min.   :2.600   Min.   :1.900   Min.   :2.300   Min.   :2.900  
+##  1st Qu.:4.600   1st Qu.:3.175   1st Qu.:4.700   1st Qu.:4.500  
+##  Median :5.450   Median :4.000   Median :5.750   Median :4.900  
+##  Mean   :5.442   Mean   :4.010   Mean   :5.805   Mean   :5.123  
+##  3rd Qu.:6.325   3rd Qu.:4.800   3rd Qu.:6.800   3rd Qu.:5.800  
+##  Max.   :7.800   Max.   :6.500   Max.   :8.400   Max.   :8.200  
+##    ComPricing      WartyClaim      OrdBilling       DelSpeed    
+##  Min.   :3.700   Min.   :4.100   Min.   :2.000   Min.   :1.600  
+##  1st Qu.:5.875   1st Qu.:5.400   1st Qu.:3.700   1st Qu.:3.400  
+##  Median :7.100   Median :6.100   Median :4.400   Median :3.900  
+##  Mean   :6.974   Mean   :6.043   Mean   :4.278   Mean   :3.886  
+##  3rd Qu.:8.400   3rd Qu.:6.600   3rd Qu.:4.800   3rd Qu.:4.425  
+##  Max.   :9.900   Max.   :8.100   Max.   :6.700   Max.   :5.500  
+##   Satisfaction  
+##  Min.   :4.700  
+##  1st Qu.:6.000  
+##  Median :7.050  
+##  Mean   :6.918  
+##  3rd Qu.:7.625  
+##  Max.   :9.900</code></pre>
+<pre class="r"><code>plot_str(hairData, fontSize = 40)
+plot_intro(hairData, title = &quot;Hair Factors Dataset Structure&quot;)</code></pre>
+<p><img src="PCA_Regression_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<pre class="r"><code>plot_missing(hairData, title = &quot;Hair Factors Dataset Missing Values&quot;)</code></pre>
+<p><img src="PCA_Regression_files/figure-html/unnamed-chunk-3-2.png" width="672" /></p>
+<p>Setting variables names and removing ID column</p>
+<pre class="r"><code>expandVar = c(&quot;Product Quality&quot;, &quot;E-Commerce&quot;,&quot;Technical Support&quot;,&quot;Complaint Resolution&quot;,
+              &quot;Advertising&quot;, &quot;Product Line&quot;,&quot;Salesforce Image&quot;,&quot;Competitive Pricing&quot;,
+              &quot;Warranty &amp; Claims&quot;, &quot;Order &amp; Billing&quot;, &quot;Delivery Speed&quot;,&quot;Customer Satisfaction&quot;)
+
+varNames = cbind(names(hairData), expandVar)</code></pre>
+<pre><code>## Warning in cbind(names(hairData), expandVar): number of rows of result is
+## not a multiple of vector length (arg 2)</code></pre>
+<pre class="r"><code>colnames(varNames) = c(&quot;Variable&quot;, &quot;Expanded Name&quot;)
+formattable(as.data.frame(varNames), align = &#39;l&#39;)</code></pre>
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:left;">
+Expanded Name
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+ID
+</td>
+<td style="text-align:left;">
+Product Quality
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ProdQual
+</td>
+<td style="text-align:left;">
+E-Commerce
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ecom
+</td>
+<td style="text-align:left;">
+Technical Support
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TechSup
+</td>
+<td style="text-align:left;">
+Complaint Resolution
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CompRes
+</td>
+<td style="text-align:left;">
+Advertising
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Advertising
+</td>
+<td style="text-align:left;">
+Product Line
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ProdLine
+</td>
+<td style="text-align:left;">
+Salesforce Image
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+SalesFImage
+</td>
+<td style="text-align:left;">
+Competitive Pricing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ComPricing
+</td>
+<td style="text-align:left;">
+Warranty &amp; Claims
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WartyClaim
+</td>
+<td style="text-align:left;">
+Order &amp; Billing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+OrdBilling
+</td>
+<td style="text-align:left;">
+Delivery Speed
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DelSpeed
+</td>
+<td style="text-align:left;">
+Customer Satisfaction
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Satisfaction
+</td>
+<td style="text-align:left;">
+Product Quality
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>hairData = subset(hairData, select = -c(ID))</code></pre>
+<p>Variable statistics</p>
+<pre class="r"><code>formattable(stat.desc(hairData), digits=2)</code></pre>
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+ProdQual
+</th>
+<th style="text-align:right;">
+Ecom
+</th>
+<th style="text-align:right;">
+TechSup
+</th>
+<th style="text-align:right;">
+CompRes
+</th>
+<th style="text-align:right;">
+Advertising
+</th>
+<th style="text-align:right;">
+ProdLine
+</th>
+<th style="text-align:right;">
+SalesFImage
+</th>
+<th style="text-align:right;">
+ComPricing
+</th>
+<th style="text-align:right;">
+WartyClaim
+</th>
+<th style="text-align:right;">
+OrdBilling
+</th>
+<th style="text-align:right;">
+DelSpeed
+</th>
+<th style="text-align:right;">
+Satisfaction
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+nbr.val
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+<td style="text-align:right;">
+100.000
+</td>
+<td style="text-align:right;">
+100.000
+</td>
+<td style="text-align:right;">
+100.000
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+nbr.null
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+nbr.na
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+min
+</td>
+<td style="text-align:right;">
+5.00
+</td>
+<td style="text-align:right;">
+2.20
+</td>
+<td style="text-align:right;">
+1.30
+</td>
+<td style="text-align:right;">
+2.60
+</td>
+<td style="text-align:right;">
+1.90
+</td>
+<td style="text-align:right;">
+2.30
+</td>
+<td style="text-align:right;">
+2.90
+</td>
+<td style="text-align:right;">
+3.70
+</td>
+<td style="text-align:right;">
+4.100
+</td>
+<td style="text-align:right;">
+2.000
+</td>
+<td style="text-align:right;">
+1.600
+</td>
+<td style="text-align:right;">
+4.70
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+max
+</td>
+<td style="text-align:right;">
+10.00
+</td>
+<td style="text-align:right;">
+5.70
+</td>
+<td style="text-align:right;">
+8.50
+</td>
+<td style="text-align:right;">
+7.80
+</td>
+<td style="text-align:right;">
+6.50
+</td>
+<td style="text-align:right;">
+8.40
+</td>
+<td style="text-align:right;">
+8.20
+</td>
+<td style="text-align:right;">
+9.90
+</td>
+<td style="text-align:right;">
+8.100
+</td>
+<td style="text-align:right;">
+6.700
+</td>
+<td style="text-align:right;">
+5.500
+</td>
+<td style="text-align:right;">
+9.90
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+range
+</td>
+<td style="text-align:right;">
+5.00
+</td>
+<td style="text-align:right;">
+3.50
+</td>
+<td style="text-align:right;">
+7.20
+</td>
+<td style="text-align:right;">
+5.20
+</td>
+<td style="text-align:right;">
+4.60
+</td>
+<td style="text-align:right;">
+6.10
+</td>
+<td style="text-align:right;">
+5.30
+</td>
+<td style="text-align:right;">
+6.20
+</td>
+<td style="text-align:right;">
+4.000
+</td>
+<td style="text-align:right;">
+4.700
+</td>
+<td style="text-align:right;">
+3.900
+</td>
+<td style="text-align:right;">
+5.20
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sum
+</td>
+<td style="text-align:right;">
+781.00
+</td>
+<td style="text-align:right;">
+367.20
+</td>
+<td style="text-align:right;">
+536.50
+</td>
+<td style="text-align:right;">
+544.20
+</td>
+<td style="text-align:right;">
+401.00
+</td>
+<td style="text-align:right;">
+580.50
+</td>
+<td style="text-align:right;">
+512.30
+</td>
+<td style="text-align:right;">
+697.40
+</td>
+<td style="text-align:right;">
+604.300
+</td>
+<td style="text-align:right;">
+427.800
+</td>
+<td style="text-align:right;">
+388.600
+</td>
+<td style="text-align:right;">
+691.80
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+median
+</td>
+<td style="text-align:right;">
+8.00
+</td>
+<td style="text-align:right;">
+3.60
+</td>
+<td style="text-align:right;">
+5.40
+</td>
+<td style="text-align:right;">
+5.45
+</td>
+<td style="text-align:right;">
+4.00
+</td>
+<td style="text-align:right;">
+5.75
+</td>
+<td style="text-align:right;">
+4.90
+</td>
+<td style="text-align:right;">
+7.10
+</td>
+<td style="text-align:right;">
+6.100
+</td>
+<td style="text-align:right;">
+4.400
+</td>
+<td style="text-align:right;">
+3.900
+</td>
+<td style="text-align:right;">
+7.05
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+mean
+</td>
+<td style="text-align:right;">
+7.81
+</td>
+<td style="text-align:right;">
+3.67
+</td>
+<td style="text-align:right;">
+5.37
+</td>
+<td style="text-align:right;">
+5.44
+</td>
+<td style="text-align:right;">
+4.01
+</td>
+<td style="text-align:right;">
+5.80
+</td>
+<td style="text-align:right;">
+5.12
+</td>
+<td style="text-align:right;">
+6.97
+</td>
+<td style="text-align:right;">
+6.043
+</td>
+<td style="text-align:right;">
+4.278
+</td>
+<td style="text-align:right;">
+3.886
+</td>
+<td style="text-align:right;">
+6.92
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+SE.mean
+</td>
+<td style="text-align:right;">
+0.14
+</td>
+<td style="text-align:right;">
+0.07
+</td>
+<td style="text-align:right;">
+0.15
+</td>
+<td style="text-align:right;">
+0.12
+</td>
+<td style="text-align:right;">
+0.11
+</td>
+<td style="text-align:right;">
+0.13
+</td>
+<td style="text-align:right;">
+0.11
+</td>
+<td style="text-align:right;">
+0.15
+</td>
+<td style="text-align:right;">
+0.082
+</td>
+<td style="text-align:right;">
+0.093
+</td>
+<td style="text-align:right;">
+0.073
+</td>
+<td style="text-align:right;">
+0.12
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CI.mean.0.95
+</td>
+<td style="text-align:right;">
+0.28
+</td>
+<td style="text-align:right;">
+0.14
+</td>
+<td style="text-align:right;">
+0.30
+</td>
+<td style="text-align:right;">
+0.24
+</td>
+<td style="text-align:right;">
+0.22
+</td>
+<td style="text-align:right;">
+0.26
+</td>
+<td style="text-align:right;">
+0.21
+</td>
+<td style="text-align:right;">
+0.31
+</td>
+<td style="text-align:right;">
+0.163
+</td>
+<td style="text-align:right;">
+0.184
+</td>
+<td style="text-align:right;">
+0.146
+</td>
+<td style="text-align:right;">
+0.24
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+var
+</td>
+<td style="text-align:right;">
+1.95
+</td>
+<td style="text-align:right;">
+0.49
+</td>
+<td style="text-align:right;">
+2.34
+</td>
+<td style="text-align:right;">
+1.46
+</td>
+<td style="text-align:right;">
+1.27
+</td>
+<td style="text-align:right;">
+1.73
+</td>
+<td style="text-align:right;">
+1.15
+</td>
+<td style="text-align:right;">
+2.39
+</td>
+<td style="text-align:right;">
+0.672
+</td>
+<td style="text-align:right;">
+0.863
+</td>
+<td style="text-align:right;">
+0.539
+</td>
+<td style="text-align:right;">
+1.42
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+std.dev
+</td>
+<td style="text-align:right;">
+1.40
+</td>
+<td style="text-align:right;">
+0.70
+</td>
+<td style="text-align:right;">
+1.53
+</td>
+<td style="text-align:right;">
+1.21
+</td>
+<td style="text-align:right;">
+1.13
+</td>
+<td style="text-align:right;">
+1.32
+</td>
+<td style="text-align:right;">
+1.07
+</td>
+<td style="text-align:right;">
+1.55
+</td>
+<td style="text-align:right;">
+0.820
+</td>
+<td style="text-align:right;">
+0.929
+</td>
+<td style="text-align:right;">
+0.734
+</td>
+<td style="text-align:right;">
+1.19
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+coef.var
+</td>
+<td style="text-align:right;">
+0.18
+</td>
+<td style="text-align:right;">
+0.19
+</td>
+<td style="text-align:right;">
+0.29
+</td>
+<td style="text-align:right;">
+0.22
+</td>
+<td style="text-align:right;">
+0.28
+</td>
+<td style="text-align:right;">
+0.23
+</td>
+<td style="text-align:right;">
+0.21
+</td>
+<td style="text-align:right;">
+0.22
+</td>
+<td style="text-align:right;">
+0.136
+</td>
+<td style="text-align:right;">
+0.217
+</td>
+<td style="text-align:right;">
+0.189
+</td>
+<td style="text-align:right;">
+0.17
+</td>
+</tr>
+</tbody>
+</table>
+<p>Attaching file</p>
+<pre class="r"><code>attach(hairData)</code></pre>
+<pre><code>## The following objects are masked from hairData (pos = 3):
+## 
+##     Advertising, CompRes, ComPricing, DelSpeed, Ecom, OrdBilling,
+##     ProdLine, ProdQual, SalesFImage, Satisfaction, TechSup,
+##     WartyClaim</code></pre>
+<pre><code>## The following objects are masked from hairData (pos = 4):
+## 
+##     Advertising, CompRes, ComPricing, DelSpeed, Ecom, OrdBilling,
+##     ProdLine, ProdQual, SalesFImage, Satisfaction, TechSup,
+##     WartyClaim</code></pre>
+<p>Plot histograms, density and box plots</p>
+<pre class="r"><code>par(mfrow = c(3,4))
+for (i in 1:12){
+  r = hairData[,i]
+  hist_boxplot(r, freq = FALSE, density = TRUE, main = colnames(hairData[i]), xlab = &quot;Score&quot;)
+}</code></pre>
+<p><img src="PCA_Regression_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<pre class="r"><code>dev.off()</code></pre>
+<pre><code>## null device 
+##           1</code></pre>
+<p>Checking for normality - Q-Q Plots</p>
+<pre class="r"><code>plot_qq(hairData, ncol = 4, nrow = 3, title = &quot;Q-Q Plots&quot;)</code></pre>
+<p><img src="PCA_Regression_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>Correlation matrix</p>
+<pre class="r"><code>corrplot::corrplot(cor(hairData), method = &quot;number&quot;, type = &quot;upper&quot;)</code></pre>
+<p><img src="PCA_Regression_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>Checking for Multicollinearity using the Value Inflation Fatcor</p>
+<pre class="r"><code>modelHairData = lm(Satisfaction ~ ProdQual+Ecom+TechSup+CompRes+Advertising+ProdLine+SalesFImage+ComPricing+WartyClaim+OrdBilling+DelSpeed,
+                   data = hairData)
+VIF_Value = vif(modelHairData)
+formattable(as.data.frame(VIF_Value))</code></pre>
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+VIF_Value
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+ProdQual
+</td>
+<td style="text-align:right;">
+1.635797
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ecom
+</td>
+<td style="text-align:right;">
+2.756694
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TechSup
+</td>
+<td style="text-align:right;">
+2.976796
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CompRes
+</td>
+<td style="text-align:right;">
+4.730448
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Advertising
+</td>
+<td style="text-align:right;">
+1.508933
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ProdLine
+</td>
+<td style="text-align:right;">
+3.488185
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+SalesFImage
+</td>
+<td style="text-align:right;">
+3.439420
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ComPricing
+</td>
+<td style="text-align:right;">
+1.635000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WartyClaim
+</td>
+<td style="text-align:right;">
+3.198337
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+OrdBilling
+</td>
+<td style="text-align:right;">
+2.902999
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DelSpeed
+</td>
+<td style="text-align:right;">
+6.516014
+</td>
+</tr>
+</tbody>
+</table>
+<p>Build Regression model</p>
+<pre class="r"><code>regHairData = summary(modelHairData)
+regHairData</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Satisfaction ~ ProdQual + Ecom + TechSup + CompRes + 
+##     Advertising + ProdLine + SalesFImage + ComPricing + WartyClaim + 
+##     OrdBilling + DelSpeed, data = hairData)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.43005 -0.31165  0.07621  0.37190  0.90120 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.66961    0.81233  -0.824  0.41199    
+## ProdQual     0.37137    0.05177   7.173 2.18e-10 ***
+## Ecom        -0.44056    0.13396  -3.289  0.00145 ** 
+## TechSup      0.03299    0.06372   0.518  0.60591    
+## CompRes      0.16703    0.10173   1.642  0.10416    
+## Advertising -0.02602    0.06161  -0.422  0.67382    
+## ProdLine     0.14034    0.08025   1.749  0.08384 .  
+## SalesFImage  0.80611    0.09775   8.247 1.45e-12 ***
+## ComPricing  -0.03853    0.04677  -0.824  0.41235    
+## WartyClaim  -0.10298    0.12330  -0.835  0.40587    
+## OrdBilling   0.14635    0.10367   1.412  0.16160    
+## DelSpeed     0.16570    0.19644   0.844  0.40124    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.5623 on 88 degrees of freedom
+## Multiple R-squared:  0.8021, Adjusted R-squared:  0.7774 
+## F-statistic: 32.43 on 11 and 88 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>Shapiro-Wilks Test for normality</p>
+<pre class="r"><code>hairLapply = lapply(hairData, shapiro.test)
+str(hairLapply)</code></pre>
+<pre><code>## List of 12
+##  $ ProdQual    :List of 4
+##   ..$ statistic: Named num 0.95
+##   .. ..- attr(*, &quot;names&quot;)= chr &quot;W&quot;
+##   ..$ p.value  : num 0.000795
+##   ..$ method   : chr &quot;Shapiro-Wilk normality test&quot;
+##   ..$ data.name: chr &quot;X[[i]]&quot;
+##   ..- attr(*, &quot;class&quot;)= chr &quot;htest&quot;
+##  $ Ecom        :List of 4
+##   ..$ statistic: Named num 0.959
+##   .. ..- attr(*, &quot;names&quot;)= chr &quot;W&quot;
+##   ..$ p.value  : num 0.00316
+##   ..$ method   : chr &quot;Shapiro-Wilk normality test&quot;
+##   ..$ data.name: chr &quot;X[[i]]&quot;
+##   ..- attr(*, &quot;class&quot;)= chr &quot;htest&quot;
+##  $ TechSup     :List of 4
+##   ..$ statistic: Named num 0.986
+##   .. ..- attr(*, &quot;names&quot;)= chr &quot;W&quot;
+##   ..$ p.value  : num 0.39
+##   ..$ method   : chr &quot;Shapiro-Wilk normality test&quot;
+##   ..$ data.name: chr &quot;X[[i]]&quot;
+##   ..- attr(*, &quot;class&quot;)= chr &quot;htest&quot;
+##  $ CompRes     :List of 4
+##   ..$ statistic: Named num 0.986
+##   .. ..- attr(*, &quot;names&quot;)= chr &quot;W&quot;
+##   ..$ p.value  : num 0.402
+##   ..$ method   : chr &quot;Shapiro-Wilk normality test&quot;
+##   ..$ data.name: chr &quot;X[[i]]&quot;
+##   ..- attr(*, &quot;class&quot;)= chr &quot;htest&quot;
+##  $ Advertising :List of 4
+##   ..$ statistic: Named num 0.976
+##   .. ..- attr(*, &quot;names&quot;)= chr &quot;W&quot;
+##   ..$ p.value  : num 0.0677
+##   ..$ method   : chr &quot;Shapiro-Wilk normality test&quot;
+##   ..$ data.name: chr &quot;X[[i]]&quot;
+##   ..- attr(*, &quot;class&quot;)= chr &quot;htest&quot;
+##  $ ProdLine    :List of 4
+##   ..$ statistic: Named num 0.987
+##   .. ..- attr(*, &quot;names&quot;)= chr &quot;W&quot;
+##   ..$ p.value  : num 0.432
+##   ..$ method   : chr &quot;Shapiro-Wilk normality test&quot;
+##   ..$ data.name: chr &quot;X[[i]]&quot;
+##   ..- attr(*, &quot;class&quot;)= chr &quot;htest&quot;
+##  $ SalesFImage :List of 4
+##   ..$ statistic: Named num 0.974
+##   .. ..- attr(*, &quot;names&quot;)= chr &quot;W&quot;
+##   ..$ p.value  : num 0.0453
+##   ..$ method   : chr &quot;Shapiro-Wilk normality test&quot;
+##   ..$ data.name: chr &quot;X[[i]]&quot;
+##   ..- attr(*, &quot;class&quot;)= chr &quot;htest&quot;
+##  $ ComPricing  :List of 4
+##   ..$ statistic: Named num 0.968
+##   .. ..- attr(*, &quot;names&quot;)= chr &quot;W&quot;
+##   ..$ p.value  : num 0.0145
+##   ..$ method   : chr &quot;Shapiro-Wilk normality test&quot;
+##   ..$ data.name: chr &quot;X[[i]]&quot;
+##   ..- attr(*, &quot;class&quot;)= chr &quot;htest&quot;
+##  $ WartyClaim  :List of 4
+##   ..$ statistic: Named num 0.991
+##   .. ..- attr(*, &quot;names&quot;)= chr &quot;W&quot;
+##   ..$ p.value  : num 0.74
+##   ..$ method   : chr &quot;Shapiro-Wilk normality test&quot;
+##   ..$ data.name: chr &quot;X[[i]]&quot;
+##   ..- attr(*, &quot;class&quot;)= chr &quot;htest&quot;
+##  $ OrdBilling  :List of 4
+##   ..$ statistic: Named num 0.974
+##   .. ..- attr(*, &quot;names&quot;)= chr &quot;W&quot;
+##   ..$ p.value  : num 0.0455
+##   ..$ method   : chr &quot;Shapiro-Wilk normality test&quot;
+##   ..$ data.name: chr &quot;X[[i]]&quot;
+##   ..- attr(*, &quot;class&quot;)= chr &quot;htest&quot;
+##  $ DelSpeed    :List of 4
+##   ..$ statistic: Named num 0.982
+##   .. ..- attr(*, &quot;names&quot;)= chr &quot;W&quot;
+##   ..$ p.value  : num 0.177
+##   ..$ method   : chr &quot;Shapiro-Wilk normality test&quot;
+##   ..$ data.name: chr &quot;X[[i]]&quot;
+##   ..- attr(*, &quot;class&quot;)= chr &quot;htest&quot;
+##  $ Satisfaction:List of 4
+##   ..$ statistic: Named num 0.975
+##   .. ..- attr(*, &quot;names&quot;)= chr &quot;W&quot;
+##   ..$ p.value  : num 0.0556
+##   ..$ method   : chr &quot;Shapiro-Wilk normality test&quot;
+##   ..$ data.name: chr &quot;X[[i]]&quot;
+##   ..- attr(*, &quot;class&quot;)= chr &quot;htest&quot;</code></pre>
+<pre class="r"><code>hairSapply = sapply(hairLapply, &#39;[&#39;, c(&quot;statistic&quot;,&quot;p.value&quot;))
+hairShapiro = t(hairSapply)
+hairShapiro = as.data.frame(hairShapiro)
+formattable(hairShapiro, digits = 4)</code></pre>
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+p.value
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+ProdQual
+</td>
+<td style="text-align:right;">
+0.9497
+</td>
+<td style="text-align:right;">
+0.0007953
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ecom
+</td>
+<td style="text-align:right;">
+0.9585
+</td>
+<td style="text-align:right;">
+0.003157
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TechSup
+</td>
+<td style="text-align:right;">
+0.9863
+</td>
+<td style="text-align:right;">
+0.39
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CompRes
+</td>
+<td style="text-align:right;">
+0.9865
+</td>
+<td style="text-align:right;">
+0.4023
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Advertising
+</td>
+<td style="text-align:right;">
+0.9763
+</td>
+<td style="text-align:right;">
+0.06769
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ProdLine
+</td>
+<td style="text-align:right;">
+0.9869
+</td>
+<td style="text-align:right;">
+0.4324
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+SalesFImage
+</td>
+<td style="text-align:right;">
+0.974
+</td>
+<td style="text-align:right;">
+0.04534
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ComPricing
+</td>
+<td style="text-align:right;">
+0.9676
+</td>
+<td style="text-align:right;">
+0.01448
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WartyClaim
+</td>
+<td style="text-align:right;">
+0.9909
+</td>
+<td style="text-align:right;">
+0.7404
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+OrdBilling
+</td>
+<td style="text-align:right;">
+0.9741
+</td>
+<td style="text-align:right;">
+0.04549
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DelSpeed
+</td>
+<td style="text-align:right;">
+0.9816
+</td>
+<td style="text-align:right;">
+0.177
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Satisfaction
+</td>
+<td style="text-align:right;">
+0.9752
+</td>
+<td style="text-align:right;">
+0.05556
+</td>
+</tr>
+</tbody>
+</table>
+<p>Normalisation of variables</p>
+<pre class="r"><code>ProdQualNorm = bestNormalize::orderNorm(ProdQual, warn = FALSE)
+ProdQualNorm</code></pre>
+<pre><code>## orderNorm Transformation with 100 nonmissing obs and ties
+##  - 43 unique values 
+##  - Original quantiles:
+##     0%    25%    50%    75%   100% 
+##  5.000  6.575  8.000  9.100 10.000</code></pre>
+<pre class="r"><code>EcomNorm = bestNormalize::arcsinh_x(Ecom)
+EcomNorm</code></pre>
+<pre><code>## Standardized asinh(x) Transformation with 100 nonmissing obs.:
+##  Relevant statistics:
+##  - mean (before standardization) = 1.996218 
+##  - sd (before standardization) = 0.1809518</code></pre>
+<pre class="r"><code>SalesFImageNorm = bestNormalize::sqrt_x(SalesFImage)
+SalesFImageNorm</code></pre>
+<pre><code>## Standardized sqrt(x + a) Transformation with 100 nonmissing obs.:
+##  Relevant statistics:
+##  - a = 0 
+##  - mean (before standardization) = 2.251074 
+##  - sd (before standardization) = 0.2371262</code></pre>
+<pre class="r"><code>ComPricingNorm = bestNormalize::orderNorm(ComPricing)</code></pre>
+<pre><code>## Warning in bestNormalize::orderNorm(ComPricing): Ties in data, Normal distribution not guaranteed</code></pre>
+<pre class="r"><code>ComPricingNorm</code></pre>
+<pre><code>## orderNorm Transformation with 100 nonmissing obs and ties
+##  - 45 unique values 
+##  - Original quantiles:
+##    0%   25%   50%   75%  100% 
+## 3.700 5.875 7.100 8.400 9.900</code></pre>
+<pre class="r"><code>OrdBillingNorm = bestNormalize::boxcox(OrdBilling)
+OrdBillingNorm</code></pre>
+<pre><code>## Standardized Box Cox Transformation with 100 nonmissing obs.:
+##  Estimated statistics:
+##  - lambda = 1.452965 
+##  - mean (before standardization) = 5.088678 
+##  - sd (before standardization) = 1.758168</code></pre>
+<pre class="r"><code>par(mfrow = c(2,3))
+hist_boxplot(ProdQualNorm[[&quot;x.t&quot;]],freq = FALSE, density = TRUE, main = &quot;ProdQual - Normalised&quot;, xlab = &quot;Scale&quot;)
+hist_boxplot(EcomNorm[[&quot;x.t&quot;]],freq = FALSE, density = TRUE, main = &quot;Ecom - Normalised&quot;, xlab = &quot;Scale&quot;)
+hist_boxplot(SalesFImageNorm[[&quot;x.t&quot;]],freq = FALSE, density = TRUE, main = &quot;SalesFImage - Normalised&quot;, xlab = &quot;Scale&quot;)
+hist_boxplot(ComPricingNorm[[&quot;x.t&quot;]],freq = FALSE, density = TRUE, main = &quot;ComPricing - Normalised&quot;, xlab = &quot;Scale&quot;)
+hist_boxplot(OrdBillingNorm[[&quot;x.t&quot;]],freq = FALSE, density = TRUE, main = &quot;OrdBilling - Normalised&quot;, xlab = &quot;Scale&quot;)
+dev.off()</code></pre>
+<pre><code>## null device 
+##           1</code></pre>
+<pre class="r"><code>transfData = cbind(ProdQualNorm[[&quot;x.t&quot;]],EcomNorm[[&quot;x.t&quot;]],SalesFImageNorm[[&quot;x.t&quot;]], ComPricingNorm[[&quot;x.t&quot;]], OrdBillingNorm[[&quot;x.t&quot;]])
+colnames(transfData) = c(&quot;ProdQualT&quot;,&quot;EcomT&quot;,&quot;SalesFImageT&quot;,&quot;ComPricingT&quot;,&quot;OrdBillingT&quot;)
+transfData = as.data.frame(transfData)
+head(transfData)</code></pre>
+<pre><code>##    ProdQualT      EcomT SalesFImageT ComPricingT OrdBillingT
+## 1  0.2533471  0.4086813    0.8367523  -0.1763742  0.77178024
+## 2  0.1130385 -1.5317108   -2.0680639  -0.8416212 -0.45775676
+## 3  0.8238936 -0.3223972    0.6631282  -1.6448536  1.25184221
+## 4 -0.8238936 -0.4804795   -0.5471917   1.2265281 -0.02670804
+## 5  0.6128130 -0.3223972   -0.5471917  -0.1763742  0.19583894
+## 6 -0.7063026 -1.3428370   -1.3812705   0.9741139 -0.76824708</code></pre>
+<pre class="r"><code>str(transfData)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    100 obs. of  5 variables:
+##  $ ProdQualT   : num  0.253 0.113 0.824 -0.824 0.613 ...
+##  $ EcomT       : num  0.409 -1.532 -0.322 -0.48 -0.322 ...
+##  $ SalesFImageT: num  0.837 -2.068 0.663 -0.547 -0.547 ...
+##  $ ComPricingT : num  -0.176 -0.842 -1.645 1.227 -0.176 ...
+##  $ OrdBillingT : num  0.7718 -0.4578 1.2518 -0.0267 0.1958 ...</code></pre>
+<pre class="r"><code>summary(transfData)</code></pre>
+<pre><code>##    ProdQualT             EcomT           SalesFImageT    
+##  Min.   :-2.575829   Min.   :-2.57835   Min.   :-2.3116  
+##  1st Qu.:-0.670704   1st Qu.:-0.52111   1st Qu.:-0.5472  
+##  Median : 0.012533   Median :-0.01869   Median :-0.1581  
+##  Mean   :-0.001917   Mean   : 0.00000   Mean   : 0.0000  
+##  3rd Qu.: 0.706303   3rd Qu.: 0.44259   3rd Qu.: 0.6631  
+##  Max.   : 2.326348   Max.   : 2.45924   Max.   : 2.5830  
+##   ComPricingT          OrdBillingT      
+##  Min.   :-2.5758293   Min.   :-2.21407  
+##  1st Qu.:-0.6435817   1st Qu.:-0.66600  
+##  Median : 0.0000000   Median : 0.08399  
+##  Mean   : 0.0001135   Mean   : 0.00000  
+##  3rd Qu.: 0.7721932   3rd Qu.: 0.53811  
+##  Max.   : 2.5758293   Max.   : 2.92210</code></pre>
+<p>Checking Shapiro-Wilks Test after normalisation</p>
+<pre class="r"><code>transLapply = lapply((transfData), shapiro.test)
+transSapply = sapply(transLapply, &#39;[&#39;, c(&quot;statistic&quot;,&quot;p.value&quot;))
+transShapiro = t(transSapply)
+transShapiro = as.data.frame(transShapiro)
+formattable(transShapiro, digits = 6)</code></pre>
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+p.value
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+ProdQualT
+</td>
+<td style="text-align:right;">
+0.995638
+</td>
+<td style="text-align:right;">
+0.988263
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+EcomT
+</td>
+<td style="text-align:right;">
+0.980537
+</td>
+<td style="text-align:right;">
+0.14634
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+SalesFImageT
+</td>
+<td style="text-align:right;">
+0.979668
+</td>
+<td style="text-align:right;">
+0.125241
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ComPricingT
+</td>
+<td style="text-align:right;">
+0.997918
+</td>
+<td style="text-align:right;">
+0.999953
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+OrdBillingT
+</td>
+<td style="text-align:right;">
+0.98033
+</td>
+<td style="text-align:right;">
+0.141034
+</td>
+</tr>
+</tbody>
+</table>
+<p>Scaling the remaining variables</p>
+<pre class="r"><code>set.seed(12)
+hairDataS = hairData%&gt;%dplyr::select(-c(ProdQual,Ecom,SalesFImage,ComPricing,OrdBilling))
+head(hairDataS) </code></pre>
+<pre><code>##   TechSup CompRes Advertising ProdLine WartyClaim DelSpeed Satisfaction
+## 1     2.5     5.9         4.8      4.9        4.7      3.7          8.2
+## 2     5.1     7.2         3.4      7.9        5.5      4.9          5.7
+## 3     5.6     5.6         5.4      7.4        6.2      4.5          8.9
+## 4     7.0     3.7         4.7      4.7        7.0      3.0          4.8
+## 5     5.2     4.6         2.2      6.0        6.1      3.5          7.1
+## 6     3.1     4.1         4.0      4.3        5.1      3.3          4.7</code></pre>
+<pre class="r"><code>hairDataScaled = sapply(hairDataS, scale)  
+head(hairDataScaled)</code></pre>
+<pre><code>##         TechSup    CompRes  Advertising   ProdLine WartyClaim   DelSpeed
+## [1,] -1.8719901  0.3790126  0.701011642 -0.6880638 -1.6383280 -0.2532552
+## [2,] -0.1731509  1.4548124 -0.541287471  1.5928106 -0.6624066  1.3806490
+## [3,]  0.1535489  0.1307511  1.233425548  1.2126649  0.1915246  0.8360143
+## [4,]  1.0683085 -1.4415718  0.612275991 -0.8401221  1.1674459 -1.2063659
+## [5,] -0.1078109 -0.6967873 -1.606115282  0.1482568  0.0695344 -0.5255725
+## [6,] -1.4799503 -1.1105564 -0.008873565 -1.1442387 -1.1503673 -0.7978899
+##      Satisfaction
+## [1,]    1.0756484
+## [2,]   -1.0219499
+## [3,]    1.6629759
+## [4,]   -1.7770853
+## [5,]    0.1527052
+## [6,]   -1.8609892</code></pre>
+<pre class="r"><code>hairDataScaled = as.data.frame(hairDataScaled)%&gt;%dplyr::rename(TechSupT = TechSup, 
+                                         CompResT = CompRes,
+                                         AdvertisingT =Advertising,
+                                         ProdLineT = ProdLine,
+                                         WartyClaimT = WartyClaim,
+                                         DelSpeedT = DelSpeed,
+                                         SatisfactionT = Satisfaction)
+
+#Combining the scaled and transformed datasets
+combinedHairData = cbind(hairDataScaled,transfData)</code></pre>
+<p>Correlation matrix</p>
+<pre class="r"><code>corrplot::corrplot(cor(combinedHairData), method = &quot;number&quot;, type = &quot;upper&quot;)</code></pre>
+<p><img src="PCA_Regression_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p>Exclude the dependent variable</p>
+<pre class="r"><code>combinedHairDataX = subset(combinedHairData, select = -c(SatisfactionT))</code></pre>
+<p>Bartlett’s Test for Sphericity</p>
+<pre class="r"><code>set.seed(0)
+
+bartlettST = cortest.bartlett(cor(combinedHairDataX), n = nrow(combinedHairDataX))
+formattable(as.data.frame(bartlettST))</code></pre>
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:right;">
+chisq
+</th>
+<th style="text-align:right;">
+p.value
+</th>
+<th style="text-align:right;">
+df
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+603.4978
+</td>
+<td style="text-align:right;">
+2.41663e-93
+</td>
+<td style="text-align:right;">
+55
+</td>
+</tr>
+</tbody>
+</table>
+<p>Scree Plot</p>
+<pre class="r"><code>ev = eigen(cor(combinedHairDataX))
+ev</code></pre>
+<pre><code>## eigen() decomposition
+## $values
+##  [1] 3.3854044 2.5137727 1.6925318 1.1102389 0.6032070 0.5699999 0.4295525
+##  [8] 0.2471140 0.2133959 0.1333525 0.1014303
+## 
+## $vectors
+##             [,1]        [,2]         [,3]       [,4]         [,5]
+##  [1,] -0.1652866 -0.24691627  0.586070263 -0.2440505 -0.012703768
+##  [2,] -0.4722571  0.03033217 -0.228958699 -0.1776217 -0.048490695
+##  [3,] -0.1798816  0.37213108  0.122335003  0.3064541  0.671730875
+##  [4,] -0.3889121 -0.27485899 -0.124294615  0.2050016 -0.061890191
+##  [5,] -0.2216389 -0.20751943  0.575051275 -0.2316028 -0.008788833
+##  [6,] -0.4742701  0.08806573 -0.245774144 -0.1654092  0.039257586
+##  [7,] -0.1298094 -0.29808470  0.005171918  0.6516440 -0.434805485
+##  [8,] -0.1443319  0.45478885  0.268759544  0.2440730 -0.309921243
+##  [9,] -0.1924685  0.47458513  0.270479936  0.1788068 -0.159631016
+## [10,]  0.1636865  0.38859070 -0.076220538 -0.3597346 -0.473441090
+## [11,] -0.4364264  0.03663691 -0.177110843 -0.2153084 -0.077978115
+##               [,6]          [,7]        [,8]        [,9]        [,10]
+##  [1,] -0.114221817  0.0302272318  0.46098700 -0.33069371 -0.414555823
+##  [2,] -0.056189852  0.0000897024  0.50634655  0.06645889  0.506666655
+##  [3,] -0.484666616  0.0187272626 -0.07001102 -0.14581300  0.001462467
+##  [4,]  0.090853285  0.6248068330 -0.33356953 -0.03263823 -0.275563168
+##  [5,] -0.126515729  0.0113104200 -0.45124024  0.28411175  0.462081804
+##  [6,] -0.006322357  0.2186855276  0.07675801 -0.02397324 -0.047198681
+##  [7,] -0.431567675 -0.2234501501  0.11004527  0.02344694  0.060975603
+##  [8,]  0.380727880  0.0308836829 -0.11121727 -0.56587117  0.256378064
+##  [9,]  0.179432202 -0.0019786184  0.16761998  0.66680494 -0.315415619
+## [10,] -0.600939451  0.2573235957 -0.12922035 -0.06497142 -0.079397356
+## [11,] -0.008081509 -0.6658059872 -0.36898623 -0.11399098 -0.323278787
+##             [,11]
+##  [1,] -0.02877682
+##  [2,] -0.41116699
+##  [3,] -0.08741399
+##  [4,] -0.35353619
+##  [5,]  0.09705564
+##  [6,]  0.78832003
+##  [7,]  0.16737458
+##  [8,]  0.01625514
+##  [9,] -0.05195547
+## [10,] -0.09095141
+## [11,] -0.16542756</code></pre>
+<pre class="r"><code>eigenValues = ev$values
+eigenValues</code></pre>
+<pre><code>##  [1] 3.3854044 2.5137727 1.6925318 1.1102389 0.6032070 0.5699999 0.4295525
+##  [8] 0.2471140 0.2133959 0.1333525 0.1014303</code></pre>
+<pre class="r"><code>factors = c(1:11)
+screeData = data.frame(factors, eigenValues)
+plot(screeData, main = &quot;Scree Plot&quot;)
+lines(screeData, col = &quot;red&quot;)
+abline(h = 1)</code></pre>
+<p><img src="PCA_Regression_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<p>PCA Implementation and rotation</p>
+<pre class="r"><code>unrotated = principal(combinedHairDataX, nfactors = 4, rotate = &quot;none&quot;)
+print(unrotated, digits = 4)</code></pre>
+<pre><code>## Principal Components Analysis
+## Call: principal(r = combinedHairDataX, nfactors = 4, rotate = &quot;none&quot;)
+## Standardized loadings (pattern matrix) based upon correlation matrix
+##                  PC1     PC2     PC3     PC4     h2     u2   com
+## TechSupT      0.3041 -0.3915  0.7625 -0.2572 0.8932 0.1068 2.131
+## CompResT      0.8689  0.0481 -0.2979 -0.1872 0.8811 0.1189 1.340
+## AdvertisingT  0.3310  0.5900  0.1592  0.3229 0.5873 0.4127 2.383
+## ProdLineT     0.7156 -0.4358 -0.1617  0.2160 0.7748 0.2252 1.993
+## WartyClaimT   0.4078 -0.3290  0.7481 -0.2440 0.8938 0.1062 2.243
+## DelSpeedT     0.8726  0.1396 -0.3197 -0.1743 0.9136 0.0864 1.411
+## ProdQualT     0.2388 -0.4726  0.0067  0.6866 0.7519 0.2481 2.053
+## EcomT         0.2656  0.7211  0.3496  0.2572 0.7788 0.2212 2.059
+## SalesFImageT  0.3541  0.7524  0.3519  0.1884 0.8509 0.1491 2.052
+## ComPricingT  -0.3012  0.6161 -0.0992 -0.3790 0.6238 0.3762 2.249
+## OrdBillingT   0.8030  0.0581 -0.2304 -0.2269 0.7527 0.2473 1.345
+## 
+##                          PC1    PC2    PC3    PC4
+## SS loadings           3.3854 2.5138 1.6925 1.1102
+## Proportion Var        0.3078 0.2285 0.1539 0.1009
+## Cumulative Var        0.3078 0.5363 0.6902 0.7911
+## Proportion Explained  0.3890 0.2889 0.1945 0.1276
+## Cumulative Proportion 0.3890 0.6779 0.8724 1.0000
+## 
+## Mean item complexity =  1.9
+## Test of the hypothesis that 4 components are sufficient.
+## 
+## The root mean square of the residuals (RMSR) is  0.0608 
+##  with the empirical chi square  40.7226  with prob &lt;  0.001022 
+## 
+## Fit based upon off diagonal values = 0.9657</code></pre>
+<pre class="r"><code>rotated = principal(combinedHairDataX, nfactors = 4, rotate = &quot;varimax&quot;)
+print(rotated, digits = 4)</code></pre>
+<pre><code>## Principal Components Analysis
+## Call: principal(r = combinedHairDataX, nfactors = 4, rotate = &quot;varimax&quot;)
+## Standardized loadings (pattern matrix) based upon correlation matrix
+##                  RC1     RC2     RC3     RC4     h2     u2   com
+## TechSupT      0.0200 -0.0276  0.9380  0.1105 0.8932 0.1068 1.030
+## CompResT      0.9284  0.1049  0.0448  0.0786 0.8811 0.1189 1.045
+## AdvertisingT  0.1412  0.7481 -0.0825  0.0293 0.5873 0.4127 1.099
+## ProdLineT     0.6073 -0.0921  0.1350  0.6159 0.7748 0.2252 2.142
+## WartyClaimT   0.1132  0.0514  0.9299  0.1169 0.8938 0.1062 1.068
+## DelSpeedT     0.9391  0.1734 -0.0071  0.0395 0.9136 0.0864 1.072
+## ProdQualT    -0.0142 -0.0017 -0.0100  0.8669 0.7519 0.2481 1.001
+## EcomT         0.0307  0.8742  0.0370 -0.1109 0.7788 0.2212 1.038
+## SalesFImageT  0.1277  0.8968  0.0772 -0.1560 0.8509 0.1491 1.118
+## ComPricingT  -0.0901  0.1870 -0.2388 -0.7237 0.6238 0.3762 1.396
+## OrdBillingT   0.8563  0.1019  0.0930  0.0234 0.7527 0.2473 1.054
+## 
+##                          RC1    RC2    RC3    RC4
+## SS loadings           2.9044 2.2265 1.8447 1.7263
+## Proportion Var        0.2640 0.2024 0.1677 0.1569
+## Cumulative Var        0.2640 0.4665 0.6342 0.7911
+## Proportion Explained  0.3338 0.2559 0.2120 0.1984
+## Cumulative Proportion 0.3338 0.5896 0.8016 1.0000
+## 
+## Mean item complexity =  1.2
+## Test of the hypothesis that 4 components are sufficient.
+## 
+## The root mean square of the residuals (RMSR) is  0.0608 
+##  with the empirical chi square  40.7226  with prob &lt;  0.001022 
+## 
+## Fit based upon off diagonal values = 0.9657</code></pre>
+<p>Plot of principal components</p>
+<pre class="r"><code>plot(rotated, row.names(rotated$loadings))</code></pre>
+<p><img src="PCA_Regression_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<p>combining scores and rotated components</p>
+<pre class="r"><code>compoHairData = as.data.frame(cbind(hairData$Satisfaction, rotated$scores))
+compoHairData = compoHairData%&gt;%rename(Satisfaction_RC = V1)</code></pre>
+<p>Checking for normality and plots</p>
+<pre class="r"><code>plot_qq(compoHairData, ncol = 2, nrow = 3, title = &quot;Q-Q Plots &quot;)</code></pre>
+<p><img src="PCA_Regression_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<pre class="r"><code>compoLapply = lapply(compoHairData, shapiro.test)
+compoSapply = sapply(compoLapply, &#39;[&#39;, c(&quot;statistic&quot;,&quot;p.value&quot;))
+compoShapiro = t(compoSapply)
+compoShapiro = as.data.frame(compoShapiro)
+formattable(compoShapiro, digits = 4)</code></pre>
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+p.value
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Satisfaction_RC
+</td>
+<td style="text-align:right;">
+0.9752
+</td>
+<td style="text-align:right;">
+0.05556
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+RC1
+</td>
+<td style="text-align:right;">
+0.9868
+</td>
+<td style="text-align:right;">
+0.4228
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+RC2
+</td>
+<td style="text-align:right;">
+0.9853
+</td>
+<td style="text-align:right;">
+0.3349
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+RC3
+</td>
+<td style="text-align:right;">
+0.9857
+</td>
+<td style="text-align:right;">
+0.3538
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+RC4
+</td>
+<td style="text-align:right;">
+0.9734
+</td>
+<td style="text-align:right;">
+0.04056
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#Plot histograms, density and box plots
+par(mfrow = c(3,2))
+for (i in 1:5){
+  c = compoHairData[,i]
+  hist_boxplot(c, freq = FALSE, density = TRUE, main = colnames(compoHairData[i]), xlab = &quot;Score&quot;)
+}
+dev.off()</code></pre>
+<pre><code>## null device 
+##           1</code></pre>
+<p>Linear models - all variables</p>
+<pre class="r"><code>model1 = lm(Satisfaction_RC ~ RC1+RC2+RC3+RC4, data = compoHairData)
+summary(model1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Satisfaction_RC ~ RC1 + RC2 + RC3 + RC4, data = compoHairData)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1.6485 -0.5124  0.1177  0.4869  1.5391 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  6.91800    0.07143  96.848  &lt; 2e-16 ***
+## RC1          0.63559    0.07179   8.853 4.66e-14 ***
+## RC2          0.49126    0.07179   6.843 7.54e-10 ***
+## RC3          0.06518    0.07179   0.908    0.366    
+## RC4          0.53037    0.07179   7.388 5.74e-11 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.7143 on 95 degrees of freedom
+## Multiple R-squared:  0.6553, Adjusted R-squared:  0.6408 
+## F-statistic: 45.15 on 4 and 95 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>par(mfrow = c(2,2))
+plot(model1)</code></pre>
+<p><img src="PCA_Regression_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
+<pre class="r"><code>dev.off()</code></pre>
+<pre><code>## null device 
+##           1</code></pre>
+<p>Linear model excluding RC3</p>
+<pre class="r"><code>model2 = lm(Satisfaction_RC ~ RC1+RC2+RC4, data = compoHairData)
+summary(model2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Satisfaction_RC ~ RC1 + RC2 + RC4, data = compoHairData)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1.6663 -0.5171  0.1117  0.4889  1.5908 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  6.91800    0.07137  96.937  &lt; 2e-16 ***
+## RC1          0.63559    0.07173   8.861 4.15e-14 ***
+## RC2          0.49126    0.07173   6.849 7.06e-10 ***
+## RC4          0.53037    0.07173   7.394 5.31e-11 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.7137 on 96 degrees of freedom
+## Multiple R-squared:  0.6523, Adjusted R-squared:  0.6415 
+## F-statistic: 60.04 on 3 and 96 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>par(mfrow = c(2,2))
+plot(model2)</code></pre>
+<p><img src="PCA_Regression_files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
+<pre class="r"><code>dev.off()</code></pre>
+<pre><code>## null device 
+##           1</code></pre>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
