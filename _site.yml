@@ -6,7 +6,9 @@ navbar:
     - text: "Home"
       href: index.html
     - text: "PCA and Regression"
-      href: PCA_Regression.html      
+      href: PCA_Regression.html
+    - text: "K Means Clustering"
+      href: Credit_Card_Clustering.html      
     - text: "Market Basket Analysis"
       href: Online_Retail_Sales.html
     - text: "About Me"

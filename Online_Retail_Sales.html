@@ -10,6 +10,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
+<meta name="author" content="Kudakwashe Nyikadzino" />
 
 
 <title>Online Shopping Transaction Analysis</title>
@@ -275,6 +276,12 @@ $(document).ready(function () {
   <a href="index.html">Home</a>
 </li>
 <li>
+  <a href="PCA_Regression.html">PCA and Regression</a>
+</li>
+<li>
+  <a href="Credit_Card_Clustering.html">K Means Clustering</a>
+</li>
+<li>
   <a href="Online_Retail_Sales.html">Market Basket Analysis</a>
 </li>
 <li>
@@ -293,11 +300,13 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">Online Shopping Transaction Analysis</h1>
+<h4 class="author">Kudakwashe Nyikadzino</h4>
 
 </div>
 
 
-<p>Incuded libraries</p>
+<p>The data set contains an initial 541909 transactions for an online retail store. I use Market Basket Analysis to determine items that are usually purchased together.</p>
+<p>Load required libraries and required options</p>
 <pre class="r"><code>library(readxl)
 library(tidyverse)
 library(ggplot2)
@@ -305,7 +314,9 @@ library(dplyr)
 library(DataExplorer)
 library(arules)
 library(arulesViz)
-library(RColorBrewer)</code></pre>
+library(RColorBrewer)
+
+options(max.print = 100)</code></pre>
 <p>Read file from current working directory</p>
 <pre class="r"><code>online_data = read_excel(&quot;Online Retail.xlsx&quot;)</code></pre>
 <p>View data to have an idea of what it looks like</p>
@@ -524,7 +535,7 @@ head(avg_quantity)</code></pre>
 ## 4 536368          3.75
 ## 5 536369          3   
 ## 6 536370         22.4</code></pre>
-<pre class="r"><code>ggplot(data = avg_quantity, aes(x = avg_quantity$avg_basket)) + geom_histogram(fill = &quot;blue&quot;, bins = 50000) + geom_rug() + 
+<pre class="r"><code>ggplot(data = avg_quantity, aes(x = avg_quantity$avg_basket)) + geom_histogram(color = &quot;black&quot;, fill = &quot;#42e3f5&quot;, bins = 50000) + geom_rug() + 
   coord_cartesian(xlim = c(0,80)) + labs(x = &quot;Average Basket&quot;, y = &quot;Frequency&quot;, title = &quot;Average items purchased&quot;)</code></pre>
 <p><img src="Online_Retail_Sales_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 <p>Remove duplicate items in the same invoice</p>
@@ -603,44 +614,9 @@ summary(trxns)</code></pre>
 ##   61   40   29   43   39   39   42   34   40   29   33   39   23   25   34 
 ##   75   76   77   78   79   80   81   82   83   84   85   86   87   88   89 
 ##   26   21   19   27   15   13   20   21   15   23   17   17    9   17   11 
-##   90   91   92   93   94   95   96   97   98   99  100  101  102  103  104 
-##   12    9   15   16    7    5   10    9   13    5   11   10    3    6    9 
-##  105  106  107  108  109  110  111  112  113  114  115  116  117  118  119 
-##    2    4    7    4    4    4    7    3    5    6    6    8    6    4    8 
-##  120  121  122  123  124  125  126  127  128  129  130  131  132  133  134 
-##    5    6   11    4    5    3    4    8    1    2    4    3    3    2    5 
-##  135  136  137  138  139  140  141  142  143  144  145  146  147  148  149 
-##    4    2    6    6    2    5    6    2    2    5    5    3    2    4    5 
-##  150  151  152  153  154  155  156  157  158  159  160  161  162  163  164 
-##    3    5    3    6    2    2    2    4    4    1    2    3    3    3    2 
-##  165  166  167  168  169  170  171  172  173  174  175  176  177  178  179 
-##    5    4    1    4    4    2    2    4    3    4    2    5    5    4    2 
-##  180  181  182  183  184  185  186  187  188  189  190  191  192  193  194 
-##    4    2    6    4    3    3    3    2    3    4    4    2    3    2    3 
-##  195  196  197  198  199  202  203  204  205  206  207  208  210  211  212 
-##    3    4    2    2    3    2    5    5    1    2    1    4    1    4    1 
-##  213  214  215  216  217  218  219  220  222  223  224  225  226  227  228 
-##    1    2    1    2    4    2    2    2    1    1    3    3    1    1    1 
-##  229  230  232  233  234  235  237  238  239  241  242  243  244  247  249 
-##    2    1    1    1    1    1    3    3    1    2    1    2    2    2    3 
-##  250  253  254  255  257  259  261  262  263  264  266  267  270  275  279 
-##    2    1    2    2    2    1    2    2    1    2    1    1    2    1    2 
-##  280  282  283  285  286  288  289  291  292  295  296  298  299  301  309 
-##    2    1    2    2    1    2    1    1    1    1    1    2    1    1    1 
-##  310  315  319  320  331  332  333  334  339  341  344  345  347  348  349 
-##    1    1    1    1    1    4    1    1    1    1    1    1    2    1    1 
-##  352  354  357  358  363  369  375  376  379  382  386  388  399  404  408 
-##    2    1    1    1    1    1    1    1    1    1    1    1    2    2    1 
-##  411  414  415  416  419  420  428  433  434  438  439  443  449  453  455 
-##    1    1    1    2    1    1    1    1    2    1    2    1    1    1    1 
-##  458  460  463  471  482  486  487  488  494  499  503  506  514  515  517 
-##    1    1    1    1    1    1    1    1    1    1    2    1    1    1    1 
-##  518  520  522  524  525  527  529  531  536  539  541  543  552  561  567 
-##    1    1    1    1    2    1    1    1    1    1    1    1    1    1    1 
-##  572  578  585  588  589  593  595  599  601  607  622  629  635  645  647 
-##    1    1    2    1    1    1    1    1    1    1    1    1    1    1    1 
-##  649  661  673  676  687  703  720  731  748 1108 
-##    1    1    1    1    1    1    1    1    1    1 
+##   90   91   92   93   94   95   96   97   98   99 
+##   12    9   15   16    7    5   10    9   13    5 
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 270 entries ]
 ## 
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##    0.00    1.00   10.00   20.07   23.00 1108.00 
@@ -719,10 +695,8 @@ summary(trxns)</code></pre>
 ##       WOODEN PICTURE FRAME WHITE FINISH}  
 ## [10] {VICTORIAN SEWING BOX LARGE}</code></pre>
 <p>Frequency of purchased items</p>
-<pre class="r"><code>itemFrequencyPlot(trxns, support=0.05)</code></pre>
-<p><img src="Online_Retail_Sales_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 <pre class="r"><code>itemFrequencyPlot(trxns, topN=10)</code></pre>
-<p><img src="Online_Retail_Sales_files/figure-html/unnamed-chunk-11-2.png" width="672" /></p>
+<p><img src="Online_Retail_Sales_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 <p>Setting up rules</p>
 <pre class="r"><code>online_basket = apriori(data = trxns, parameter = list(support = 0.005, conf = 0.75))</code></pre>
 <pre><code>## Apriori
@@ -740,12 +714,12 @@ summary(trxns)</code></pre>
 ## Absolute minimum support count: 129 
 ## 
 ## set item appearances ...[0 item(s)] done [0.00s].
-## set transactions ...[4061 item(s), 25900 transaction(s)] done [0.17s].
-## sorting and recoding items ... [1267 item(s)] done [0.01s].
-## creating transaction tree ... done [0.13s].
-## checking subsets of size 1 2 3 4 5 6 done [0.37s].
+## set transactions ...[4061 item(s), 25900 transaction(s)] done [1.07s].
+## sorting and recoding items ... [1267 item(s)] done [0.00s].
+## creating transaction tree ... done [0.50s].
+## checking subsets of size 1 2 3 4 5 6 done [0.96s].
 ## writing ... [1775 rule(s)] done [0.00s].
-## creating S4 object  ... done [0.12s].</code></pre>
+## creating S4 object  ... done [0.41s].</code></pre>
 <pre class="r"><code>inspect(sort(online_basket[1:100], by = &quot;lift&quot;))</code></pre>
 <pre><code>##       lhs                                      rhs                                       support confidence      lift count
 ## [1]   {HERB MARKER MINT,                                                                                                   
@@ -904,7 +878,7 @@ inspect(sub_rules)</code></pre>
 ##       JUMBO SHOPPER VINTAGE RED PAISLEY}  =&gt; {JUMBO BAG RED RETROSPOT}             0.01459459  0.8076923  9.999632   378</code></pre>
 <pre class="r"><code>plot(sub_rules, method=&quot;graph&quot;, cex = 0.5)</code></pre>
 <p><img src="Online_Retail_Sales_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
-<p>Summary</p>
+<p>Summary of rules</p>
 <pre class="r"><code>summary(online_basket)</code></pre>
 <pre><code>## set of 1775 rules
 ## 

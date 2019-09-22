@@ -1,11 +1,15 @@
 ---
 title: "PCA and Regression Combination"
+author: "Kudakwashe Nyikadzino"
 
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+
+The objective is to use Principal Component Analysis and build a Multiple Linear Regression model to predict customer satisfaction.
 
 
 Load required libraries
@@ -255,7 +259,7 @@ plot(rotated, row.names(rotated$loadings))
 ```
 
 
-combining scores and rotated components
+Combining scores and rotated components
 ```{r}
 compoHairData = as.data.frame(cbind(hairData$Satisfaction, rotated$scores))
 compoHairData = compoHairData%>%rename(Satisfaction_RC = V1)

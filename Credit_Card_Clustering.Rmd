@@ -1,0 +1,123 @@
+---
+title: "K Means Clustering for Credit Card Data"
+author: "Kudakwashe Nyikadzino"
+
+---
+
+
+The data set used for this analysis is credit card usage. The data contains behavioural variables for each customer's credit card usage. The clustering exercise is used to segment customers based on their credit card usage. This segmentation can be used to implement the appropriate marketing strategy for each group of customer for example.
+
+
+
+Load required libraries
+```{r}
+library(DataExplorer)
+library(dplyr)
+library(NbClust)
+library(factoextra)
+library(ggplot2)
+library(cluster)
+library(ggfortify)
+
+options(max.print = 100)
+
+```
+
+
+Loading credit card data
+```{r}
+credit_data = read.csv("CC GENERAL.csv", header = TRUE)
+
+```
+
+
+Have a view of the data
+```{r}
+head(credit_data)
+tail(credit_data)
+str(credit_data)
+summary(credit_data)
+
+plot_str(credit_data)
+plot_intro(credit_data)
+plot_missing(credit_data)
+
+```
+
+
+Replace all NAs with 0
+```{r}
+
+credit_data = credit_data %>% replace(is.na(.),0)
+plot_missing(credit_data)
+
+```
+
+
+Scale the data and remove factor variable CustID
+```{r}
+credit_data_scaled = scale(subset(credit_data, select = -c(CUST_ID)))
+head(credit_data_scaled)
+plot_str(as.data.frame(credit_data_scaled))
+
+```
+
+
+A graphical view of the data
+```{r}
+plot_histogram(credit_data_scaled, ncol = 3, nrow = 3)
+
+```
+
+
+Determining the number of clusters
+```{r}
+seed = 1234
+set.seed(seed)
+
+nclusters = NbClust(credit_data_scaled, min.nc = 2, max.nc = 5, method = "kmeans")
+
+```
+
+
+Visualise number of clusters
+```{r}
+set.seed(seed)
+fviz_nbclust(subset(credit_data, select = -c(CUST_ID)), kmeans, method = "wss")
+
+```
+
+
+Create dataset with 2 clusters
+```{r}
+set.seed(seed)
+
+credit_clust2 = kmeans(credit_data_scaled, centers = 2, nstart = 10,iter.max = 1000, algorithm = "Lloyd")
+credit_clust2
+
+```
+
+
+Add cluster to data set
+```{r}
+credit_data$CLUSTER = credit_clust2$cluster
+
+head(credit_data)
+
+```
+
+
+Get average values for each cluster to determine the average customer profile for each cluster
+```{r}
+credit_data_profile = aggregate(subset(credit_data, select = -c(CUST_ID)), list(credit_data$CLUSTER), FUN = "mean")
+print(credit_data_profile, digits = 2)
+
+```
+
+
+Visualising the clusters
+```{r}
+fviz_cluster(credit_clust2, data = subset(credit_data, select = -c(CUST_ID, CLUSTER)), geom = "point", main = "Credit Card Data Clusters")
+
+```
+

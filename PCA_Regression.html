@@ -10,6 +10,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
+<meta name="author" content="Kudakwashe Nyikadzino" />
 
 
 <title>PCA and Regression Combination</title>
@@ -278,6 +279,9 @@ $(document).ready(function () {
   <a href="PCA_Regression.html">PCA and Regression</a>
 </li>
 <li>
+  <a href="Credit_Card_Clustering.html">K Means Clustering</a>
+</li>
+<li>
   <a href="Online_Retail_Sales.html">Market Basket Analysis</a>
 </li>
 <li>
@@ -296,10 +300,12 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">PCA and Regression Combination</h1>
+<h4 class="author">Kudakwashe Nyikadzino</h4>
 
 </div>
 
 
+<p>The objective is to use Principal Component Analysis and build a Multiple Linear Regression model to predict customer satisfaction.</p>
 <p>Load required libraries</p>
 <pre class="r"><code>library(DataExplorer)
 library(dplyr)
@@ -1800,8 +1806,6 @@ ev</code></pre>
 ##  [7,] -0.1298094 -0.29808470  0.005171918  0.6516440 -0.434805485
 ##  [8,] -0.1443319  0.45478885  0.268759544  0.2440730 -0.309921243
 ##  [9,] -0.1924685  0.47458513  0.270479936  0.1788068 -0.159631016
-## [10,]  0.1636865  0.38859070 -0.076220538 -0.3597346 -0.473441090
-## [11,] -0.4364264  0.03663691 -0.177110843 -0.2153084 -0.077978115
 ##               [,6]          [,7]        [,8]        [,9]        [,10]
 ##  [1,] -0.114221817  0.0302272318  0.46098700 -0.33069371 -0.414555823
 ##  [2,] -0.056189852  0.0000897024  0.50634655  0.06645889  0.506666655
@@ -1812,8 +1816,6 @@ ev</code></pre>
 ##  [7,] -0.431567675 -0.2234501501  0.11004527  0.02344694  0.060975603
 ##  [8,]  0.380727880  0.0308836829 -0.11121727 -0.56587117  0.256378064
 ##  [9,]  0.179432202 -0.0019786184  0.16761998  0.66680494 -0.315415619
-## [10,] -0.600939451  0.2573235957 -0.12922035 -0.06497142 -0.079397356
-## [11,] -0.008081509 -0.6658059872 -0.36898623 -0.11399098 -0.323278787
 ##             [,11]
 ##  [1,] -0.02877682
 ##  [2,] -0.41116699
@@ -1824,8 +1826,7 @@ ev</code></pre>
 ##  [7,]  0.16737458
 ##  [8,]  0.01625514
 ##  [9,] -0.05195547
-## [10,] -0.09095141
-## [11,] -0.16542756</code></pre>
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 2 rows ]</code></pre>
 <pre class="r"><code>eigenValues = ev$values
 eigenValues</code></pre>
 <pre><code>##  [1] 3.3854044 2.5137727 1.6925318 1.1102389 0.6032070 0.5699999 0.4295525
@@ -1904,7 +1905,7 @@ print(rotated, digits = 4)</code></pre>
 <p>Plot of principal components</p>
 <pre class="r"><code>plot(rotated, row.names(rotated$loadings))</code></pre>
 <p><img src="PCA_Regression_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
-<p>combining scores and rotated components</p>
+<p>Combining scores and rotated components</p>
 <pre class="r"><code>compoHairData = as.data.frame(cbind(hairData$Satisfaction, rotated$scores))
 compoHairData = compoHairData%&gt;%rename(Satisfaction_RC = V1)</code></pre>
 <p>Checking for normality and plots</p>
